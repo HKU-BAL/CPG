@@ -20,7 +20,7 @@ blastn -db contamination -query contig.fa -outfmt 6 -max_target_seqs 1  -max_hsp
 makeblastdb -in GRCh38_alt.fa -dbtype nucl -out ref_alt_Id <br>
 blastn -db ref_alt_Id -query contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  contig_ref.tsv <br>
  
-**Step2. Positioning of contigs in GRCh38**
+**Step2. Positioning of contigs in GRCh38**  <br>
 •	Align reads to contigs <br>
 bowtie2-build filteredcontig.fa contig_Id<br>
 bowtie2 -x contig_Id -U R1_alignedmate.fq, R2_alignedmate.fq  -S readtocontig.sam<br>
