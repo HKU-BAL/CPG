@@ -1,6 +1,7 @@
 # CPG
 
 Step1. Assembly and filtering of novel contigs
+
 •	Align reads to reference 
 bwa index -p ref GRCh38_primary.fa
 bwa mem ref read1.fq read2.fq > alignment.sam
@@ -21,4 +22,13 @@ makeblastdb -in GRCh38_alt.fa -dbtype nucl -out ref_alt_Id
 blastn -db ref_alt_Id -query contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  contig_ref.tsv
 
 Step2. Positioning of contigs in GRCh38
+
+•	Align reads to contigs 
+bowtie2-build filteredcontig.fa contig_Id
+bowtie2 -x contig_Id -U R1_alignedmate.fq, R2_alignedmate.fq  -S readtocontig.sam
+
+•	Determine the placement region by reads and mates
+samtools view -h -F 2304 readtocontig.sam  | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"} {print $4,$1,$6,$2,$3}' | sed -e 's/\/[1-2]//g' |sort > readtocontig.txt
+samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 in a{ print $0 ; delete a[$1]; next }' readtocontig.txt <( samtools view alignedmate_GRCh38.sam )) | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"}{print $4,$1,$6,$2,$3}' | sed -e 's/\/[1-2]//g' | sort > pass_mates.txt
+join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt
 
