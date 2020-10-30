@@ -40,6 +40,7 @@ samtools faidx GRCh38_no_alt.fa Place_region > GRCh38_Region.fa<br>
 nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_contig.fa<br>
 delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br> 
 
-•	Classify contigs into four types, BEP/LEP/REP/Unplaced. For placed contigs, obtained the placedment positions.
-Contig_type.py
+•	Classify contigs into four types, BEP/LEP/REP/Unplaced. For placed contigs, obtained the placedment positions.  <br> 
+Contig_type.py <br> 
+
 
