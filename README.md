@@ -40,7 +40,36 @@ samtools faidx GRCh38_no_alt.fa Place_region > GRCh38_Region.fa<br>
 nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_contig.fa<br>
 delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br> 
 
-•	Classify contigs into four types, BEP/LEP/REP/Unplaced. For placed contigs, obtained the placedment positions.  <br> 
+•	Obtain BEP/LEP/REP/ contigs and the corresponding placedment positions  <br> 
 Contig_type.py <br> 
+Please remove contigs that the both end aligned to reference from the LEP/REP file. <br>
+
+# Step3. Cluster placed contigs <br>
+•	Cluster placed contigs <br>
+Bedtools sort -i  placed_contigs.bed >  placed_contigs.sorted.bed <br>
+bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed <br>
+
+•	Cluster placed contigs <br>
+Rep_obtain.py <br>
+
+•	Remove contigs with no alignments to representatives <br>
+nucmer -p align_info  rep.fa cluster.fa<br>
+
+•	Align other types of contigs to sequences in current clusters <br>
+makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id<br>
+blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
+
+•	Merge left-end placed and right-end placed contigs into a longer insertion<br>
+nucmer -f  -p align_info left_placed.fa  right_placed.fa<br>
+delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta<br>
+show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br>
+popins merge -c left_right.fa<br>
+
+•	Remove the redundancy of placed contigs<br>
+makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
+blastn -db all_placed_Id -query all_placed.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv<br>
+
+•	Cluster the unplaced contigs<br>
+cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
 
 
