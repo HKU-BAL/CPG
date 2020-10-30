@@ -1,6 +1,6 @@
 # CPG
  
-Step1. Assembly and filtering of novel contigs
+**Step1. Assembly and filtering of novel contigs** <br>
 •	Align reads to reference <br>
 bwa index -p ref GRCh38_primary.fa <br>
 bwa mem ref read1.fq read2.fq > alignment.sam
