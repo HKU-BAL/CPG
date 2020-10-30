@@ -30,13 +30,13 @@ samtools view -h -F 2304 readtocontig.sam  | samtools sort -n -O bam | bedtools 
 samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 in a{ print $0 ; delete a[$1]; next }' readtocontig.txt <( samtools view alignedmate_GRCh38.sam )) | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"}{print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" | sort > pass_mates.txt<br>
 join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt<br>
 
-•	using python scripts to examine links to contig ends only, and filter based on described unambiguity criteria<br> 
+•	Examine links to contig ends only, and filter based on described unambiguity criteria<br> 
 Place_region.py<br> 
 
 •	Extracted contig ends and GRCh38 regions with samtools faidx<br> 
 samtools faidx GRCh38_no_alt.fa Place_region > GRCh38_Region.fa<br> 
 
-•	align contigs to the region determined by the linking mates <br>
+•	Align contigs to the region determined by the linking mates <br>
 nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_contig.fa<br>
 delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br> 
 
