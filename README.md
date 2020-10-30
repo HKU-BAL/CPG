@@ -49,7 +49,7 @@ Please remove contigs that the both end aligned to reference from the LEP/REP fi
 Bedtools sort -i  placed_contigs.bed >  placed_contigs.sorted.bed <br>
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed <br>
 
-•	Cluster placed contigs <br>
+•	Choose the longest one as the representatives and get the corresponding clusters <br>
 Rep_obtain.py <br>
 
 •	Remove contigs with no alignments to representatives <br>
