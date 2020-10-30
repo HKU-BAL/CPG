@@ -33,10 +33,10 @@ join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt<br>
 using python scripts to examine links to contig ends only, and filter based on described unambiguity criteria<br> 
 Place_region.py<br> 
 
-Extracted contig ends and GRCh38 regions with samtools faidx <br> 
+# Extracted contig ends and GRCh38 regions with samtools faidx <br> 
 samtools faidx GRCh38_no_alt.fa Place_region > GRCh38_Region.fa<br> 
 nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_contig.fa<br>
-Select consecutive alignments <br> 
+# Select consecutive alignments <br> 
 delta-filter -q -r -o 0 -g aliged_info.delta > filter_info.delta <br> 
 
  
