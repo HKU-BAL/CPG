@@ -75,16 +75,16 @@ b. Classfiy the alignment result into four types:<br>
 **Overlap** (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
 **Partially map** (the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
 Users can adjust the values of identity_cutoff, coverage_cutoff, minimun_cov_cutoff based on characteristics of contigs.<br>
-Note: <br>
- For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
->nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
->nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
->delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta<br>
->delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.delta<br>
->show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords<br>
->show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  <br>      
+**Noted:** <br>
+For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
+nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
+nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
+delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta<br>
+delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.delta<br>
+show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords<br>
+show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  <br>      
         
-c. Merge pass LEP and REP contigs.
+c. Merge pass LEP and REP contigs.<br>
 popins merge -c LEP_REP.fa <br>
 
 ## 6. Remove the redundancy of placed contigs<br>
