@@ -131,15 +131,15 @@ delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords  
 ``` 
 Classify the alignment result into four situtaions:<br>
-situation1. The two representatives are identical. `identity.txt`<br>
-situation2. One representative is contained, the identity cutoff is over 90%.  `contained.txt`<br>
-situation3. The ends of two representatives overlap in the correct arrangement and orientation. `overlap.txt`<br>
-situation4. One representatives covering at least 50% of the other one. `part.txt`<br>
+situation1. The two representatives are identical. `identity.coords`<br>
+situation2. One representative is contained, the identity cutoff is over 90%.  `contained.coords`<br>
+situation3. The ends of two representatives overlap in the correct arrangement and orientation. `overlap.coords`<br>
+situation4. One representatives covering at least 50% of the other one. `part.coords`<br>
 
 5.2. Update the alignment result<br>
-Due to one contigs could have several alignment result, we set the alignment priority. 
 ``` 
-python reorg_align_info.py  --LEP_bed LEP_contigs.bed --REP_bed REP_contig.bed --Identity_path Identity.txt --Contained_path Contained.txt  --Overlap_path Overlap.txt --Part_align_path part.txt --save_folder updated_alignment_folder
+#Due to one contigs could have several alignment result, we set the alignment priority: identity > contained > overlap > part, and update the alignment results.
+python reorg_align_info.py  --LEP_bed LEP_contigs.bed --REP_bed REP_contig.bed --Identity_path identity.coords --Contained_path contained.coords  --Overlap_path overlap.coords --Part_align_path part.coords --save_folder updated_alignment_folder
 ``` 
 
 5.4. Merge the overlapping LEP and REP contigs into one contigs.<br>
