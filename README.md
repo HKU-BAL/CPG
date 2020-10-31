@@ -93,7 +93,7 @@ blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sse
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 ``` 
 b. Obtain contigs that satify conditions.<br> 
-&ensp;&ensp;&ensp;&ensp;Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster.  <br>
+&ensp;&ensp;Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster.  <br>
 &ensp;&ensp;&ensp;&ensp;File_name: Ensure_contigs.txt, file_format: Cluster_ID+'\t"+contig_ID  <br>
 • If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. (in candidate_contigs.txt)  <br>
   Format: Cluster_ID+'\t"+contig_ID <br>
