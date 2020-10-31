@@ -99,10 +99,11 @@ Obtain two types of contigs:
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
 ``` 
-Get contigs that satisy two contiditions from the list of candidate contigs. 
-Pass_contigs.py 
+Get contigs that satisy two contiditions from the list of candidate contigs. <br> 
+Pass_contigs.py <br> 
+File name: pass_contigs.txt
 
-4.3  Add other types of contigs into the current cluster (contigs from a and c)<br>
+4.3  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
 Move_contigs.py <br>
 
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
