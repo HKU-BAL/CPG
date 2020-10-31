@@ -142,13 +142,10 @@ situation4. One representatives covering at least 50% of the other one. `part.co
 python reorg_align_info.py  --LEP_bed LEP_contigs.bed --REP_bed REP_contig.bed --Identity_path identity.coords --Contained_path contained.coords  --Overlap_path overlap.coords --Part_align_path part.coords --save_folder updated_alignment_folder
 ``` 
 
-5.4. Merge the overlapping LEP and REP contigs into one contigs.<br>
+5.3 Remove false-positive potentially merging clusters.
 ``` 
-popins merge -c LEP_REP.fa <br>
-``` 
+for the fourth alignment result, please further check wehther there is at least one contig shared by the two clusters. 
 
-Then, for the fourth alignment result, please further check wehther there is at least one contig shared by the two clusters. 
-``` 
 nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   
 nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa 
 delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta 
@@ -156,8 +153,8 @@ delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.de
 show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords 
 show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  
 ```         
-The condition of a contig shared by two clusters.
-REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `contained/identity`, the two types of annotations. <br>
+The condition of a contig shared by two clusters:<br>
+REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `contained/identity`, the two types of annotations. Other alignments cannot be saved. <br>
 
 5.3. Merge pass LEP and REP contigs into one contigs.<br>
 ``` 
