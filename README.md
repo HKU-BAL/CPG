@@ -1,5 +1,8 @@
 # CPG
- 
+# Introduction <br> 
+To construct pan-genome, we provide an analysis system that carry out four major tasks. 
+Firstly, user align the sequencing reads of 486 Han Chinese to the GRCh38.p13 reference genome individually and gained reads that could not be mapped to the reference genome. The unaligned reads were assembled into contigs (continuous sequences). Any contigs identified as contaminants or mapped to GRCh38 were eliminated. Based on the alignment positions of contigs’ reads and mates to GRCh38, we classify these contigs into two types: placed and unplaced ones. The exact insertion breakpoints of the placed contigs were determined and the placed contigs were then separated into three parts: right-end-placed (REP), left-end-placed (LEP) and both-end-placed (BEP). Secondly, we compared the placed contigs against one another and clustered together the similar contigs that placed close to each other. Unplaced contigs aligned closely to the placed ones with high identities were also included in the placed clusters. The remaining unplaced contigs were clustered by the cd-hit-est method. <br>
+
 # Step1. Assembly and filtering of novel contigs <br>
 ## 1.	Align reads to reference <br>
 bwa index -p ref GRCh38_primary.fa <br>
