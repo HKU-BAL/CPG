@@ -94,14 +94,14 @@ apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_co
 ``` 
 4.2  Obtain contigs that can be added to the clusters.<br> 
  
-Obtain two types of contigs:
+&ensp;&ensp;Two types of contigs:
 ``` 
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
 ``` 
-Get contigs that satisy two contiditions from the list of candidate contigs. <br> 
-&ensp;&ensp;Pass_contigs.py <br> 
-&ensp;&ensp;File name: pass_contigs.txt
+&ensp;&ensp;Get contigs that satisy two contiditions from the list of candidate contigs. <br> 
+&ensp;&ensp;&ensp;&ensp;Pass_contigs.py <br> 
+&ensp;&ensp;&ensp;&ensp;Output name: pass_contigs.txt
 
 4.3  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
 &ensp;&ensp;Move_contigs.py <br>
