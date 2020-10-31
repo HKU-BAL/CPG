@@ -128,13 +128,13 @@ Move_contigs.py --ensure_contigs -Ensure_contigs.txt -pass_contigs pass_contigs.
 ``` 
 nucmer -f  -p align_info left_placed.fa  right_placed.fa 
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta 
-show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords 
+show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords  
 ``` 
-Classify the alignment result into four situtaions:
-situation1. The two representatives are identical. `identity.txt`
-situation2. One representative is contained, the identity cutoff is over 90%.  `contained.txt`
-situation3. The ends of two representatives overlap in the correct arrangement and orientation. `overlap.txt`
-situation4. One representatives covering at least 50% of the other one. `part.txt`
+Classify the alignment result into four situtaions:<br>
+situation1. The two representatives are identical. `identity.txt`<br>
+situation2. One representative is contained, the identity cutoff is over 90%.  `contained.txt`<br>
+situation3. The ends of two representatives overlap in the correct arrangement and orientation. `overlap.txt`<br>
+situation4. One representatives covering at least 50% of the other one. `part.txt`<br>
 
 5.2. Update the alignment result<br>
 Due to one contigs could have several alignment result, we set the alignment priority. 
