@@ -118,5 +118,3 @@ java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=al
 java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam <br>
 gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile <br>
 
-### 4. Align contigs to Pfam dataset.
-hmmscan --tblout Pfam-A.hmm 
