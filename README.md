@@ -68,18 +68,23 @@ a. If an LEP contig and an REP contig were within 100 bp in the same orientation
 nucmer -f  -p align_info left_placed.fa  right_placed.fa<br>
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta<br>
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br>
-b. Obtain 
+b. CLassfiy the alignment result into four types:
+Identity: awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt<br>
+Contained identity>= cutoff : awk '{OFS="\t"}{if ($7>=cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' *.coords |sort |uniq  > Contained.txt<br>
+Overlap: awk '{OFS="\t"}{if ($7>=90 && $11>=5&& $NF=="[END]") print $0}' *.coords |sort|uniq  > Overlap.txt<br>
+Partially map: awk '{OFS="\t"}{if (($10>=50 || $11>=50) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' *.coords|sort|uniq  > Part.txt<br>
 
 Note: 
-        nucmer -t 18 -p "Lrep_Rcluster" "cluster/"$right".fa" "rep/"$left".fa"
-        nucmer -t 18 -p "Rrep_Lcluster" "cluster/"$left".fa"  "rep/"$right".fa"
-        delta-filter  -r -q -g "Lrep_Rcluster"".delta" >"Lrep_Rcluster""_filter.delta"
-        delta-filter  -r -q -g "Rrep_Lcluster"".delta" >"Rrep_Lcluster""_filter.delta"
-        show-coords -H -T -l -c -o "Lrep_Rcluster""_filter.delta" > "Lrep_Rcluster"".coords"
-        show-coords -H -T -l -c -o "Rrep_Lcluster""_filter.delta" > "Rrep_Lcluster"".coords"
+For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
+        nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
+        nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
+        delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta<br>
+        delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.delta<br>
+        show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords<br>
+        show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  <br>      
         
-c. Merge contigs merge  two contigs were merged
-popins merge -c left_right.fa <br>
+c. Merge pass LEP and REP contigs.
+popins merge -c LEP_REP.fa <br>
 
 •	Remove the redundancy of placed contigs<br>
 makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
