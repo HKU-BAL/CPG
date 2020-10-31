@@ -67,14 +67,14 @@ Please remove contigs that the both end aligned to reference from the LEP/REP fi
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
-1.1 Get the bed file (placed_contigs.sorted.bed)<br>
+1.1  Get the bed file (placed_contigs.sorted.bed)<br>
 ``` 
 For BEP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed 
 For LEP/REP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"b[1],"-";  else print $2,$7-1,$8,$1"_"b[1],"+"}' LEP/REP_folder/* |bedtools sort -i > LEP/REP_contigs.bed
 ``` 
-1.2 Merge contigs in same type.<br>
+1.2  Merge contigs in same type.<br>
 ``` 
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed 
 ``` 
@@ -86,21 +86,21 @@ Rep_obtain.py <br>
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
 ### 4. Add other types of contigs to sequences in current clusters <br>
-4.1 Align contigs to sequences in the clusters.<br>
+4.1  Align contigs to sequences in the clusters.<br>
 ``` 
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id 
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 ``` 
-4.2 Obtain contigs that satify conditions.<br> 
-&ensp;&ensp;Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. 
-&ensp;&ensp;These contigs will be added to the current cluster. File name: Ensure_contigs.txt; File format: Cluster_ID+'\t"+contig_ID  <br>
-&ensp;&ensp;If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. <br>
-&ensp;&ensp;File name: candidate_contigs.txt; Fileformat: Cluster_ID+'\t"+contig_ID <br>
-&ensp;&ensp;Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster.<br>
-&ensp;&ensp;Pass_contigs.py <br>
-&ensp;&ensp;Output file name: pass_contigs.txt
-4.3 Add other types of contigs into the current cluster (contigs from a and c)<br>
+4.2  Obtain contigs that can be added to the clusters.<br> 
+``` 
+Obtain two types of contigs:
+awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
+awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
+Get contigs that satisy two contiditions from the list of candidate contigs. 
+Pass_contigs.py 
+``` 
+4.3  Add other types of contigs into the current cluster (contigs from a and c)<br>
 Move_contigs.py <br>
 
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
