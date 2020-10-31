@@ -77,8 +77,8 @@ Partially map(the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if ((
 Users can adjust the values of identity_cutoff, coverage_cutoff, minimun_cov_cutoff based on characteristics of contigs.<br>
 Note: <br>
 For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
-         >nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
-         >nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
+> nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
+>nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
          delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta<br>
          delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.delta<br>
          show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords<br>
