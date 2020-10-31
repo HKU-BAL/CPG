@@ -69,14 +69,14 @@ Please remove contigs that the both end aligned to reference from the LEP/REP fi
 ### 1.	Cluster placed contigs <br>
 a. Get the bed file (placed_contigs.sorted.bed)<br>
 ``` 
-For BEP contigs,<br>
+For BEP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed 
-For LEP/REP contigs,<br>
+For LEP/REP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"b[1],"-";  else print $2,$7-1,$8,$1"_"b[1],"+"}' LEP/REP_folder/* |bedtools sort -i > LEP/REP_contigs.bed
 ``` 
 b. Merge contigs in same type.<br>
 ``` 
-bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed <br>
+bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed 
 ``` 
 ### 2. Choose the longest one as the representatives and get the corresponding clusters <br>
 Rep_obtain.py <br>
@@ -88,17 +88,17 @@ nucmer -p align_info  rep.fa cluster.fa<br>
 ### 4. Add other types of contigs to sequences in current clusters <br>
 ``` 
 A. Align contigs to sequences in the clusters.
-makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id<br>
+makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id 
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
-apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
+apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 
 B. Obtain contigs that satify conditions.
-•	Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster. <br>
-   File_name: Ensure_contigs.txt, file_format: Cluster_ID+'\t"+contig_ID<br>
-•	If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
-   Format: Cluster_ID+'\t"+contig_ID<br>
-•	Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster. (in pass_contigs.txt) <br>
-   Pass_contigs.py<br> 
+• Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster. <br>
+  File_name: Ensure_contigs.txt, file_format: Cluster_ID+'\t"+contig_ID<br>
+• If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
+  Format: Cluster_ID+'\t"+contig_ID<br>
+• Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster. (in pass_contigs.txt) <br>
+  Pass_contigs.py<br> 
 C. Add other types of contigs into the current cluster (contigs from a and c)<br>
 Move_contigs.py<br>
 ``` 
