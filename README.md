@@ -138,8 +138,8 @@ awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAIN
 awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt  #the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 
 awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt #the default value of coverage_cutoff is 50
 
-Then, for the fourth alignment result, please further check wehther there is at least one contig shared by the two clusters. 
 
+Then, for the fourth alignment result, please further check wehther there is at least one contig shared by the two clusters. 
 nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   
 nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa 
 delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta 
