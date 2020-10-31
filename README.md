@@ -11,7 +11,7 @@ Firstly, we aligned the sequencing reads of 486 Han Chinese to the GRCh38.p13 re
 
 # Construction <br> 
 ## Data format <br> 
-The name format of raw reads is Prefix+"_"+read_ID+"_"+sample_ID, like K14_17534_T1203 <br> 
+The name format of raw reads is `Prefix+"_"+read_ID+"_"+sample_ID`, like K14_17534_T1203 <br> 
 
 ## Step1. Assembly and filtering of novel contigs <br>
 ### 1.	Align reads to reference <br>
@@ -80,11 +80,12 @@ Please move contigs in BEP_contigs_all folder from the LEP/REP file to unplaced 
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
-1.1.  Get the bed file (`placed_contigs.sorted.bed`)<br>
+1.1.  Get the placement locations of contigs (`placed_contigs.sorted.bed`)<br>
 ``` 
-For BEP contigs, 
+# For BEP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed 
-For LEP/REP contigs, 
+
+# For LEP/REP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"b[1],"-";  else print $2,$7-1,$8,$1"_"b[1],"+"}' LEP/REP_folder/* |bedtools sort -i > LEP/REP_contigs.bed
 ``` 
 1.2.  Merge contigs in same type.<br>
@@ -129,13 +130,21 @@ nucmer -f  -p align_info left_placed.fa  right_placed.fa
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta 
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords 
 ``` 
+Classify the alignment result into four situtaions:
+situation1. The two representatives are identical. `identity.txt`
+situation2. One representative is contained, the identity cutoff is over 90%.  `contained.txt`
+situation3. The ends of two representatives overlap in the correct arrangement and orientation. `overlap.txt`
+situation4. One representatives covering at least 50% of the other one. `part.txt`
 
-5.2. Classfiy the alignment result into four types:<br>
+5.2. Update the alignment result<br>
+Due to one contigs could have several alignment result, we set the alignment priority. 
 ``` 
-awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt 
-awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt  #the default value of identity_cutoff is 97
-awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt  #the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 
-awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt #the default value of coverage_cutoff is 50
+python reorg_align_info.py  --LEP_bed LEP_contigs.bed --REP_bed REP_contig.bed --Identity_path Identity.txt --Contained_path Contained.txt  --Overlap_path Overlap.txt --Part_align_path part.txt --save_folder updated_alignment_folder
+``` 
+
+5.4. Merge the overlapping LEP and REP contigs into one contigs.<br>
+``` 
+popins merge -c LEP_REP.fa <br>
 ``` 
 
 Then, for the fourth alignment result, please further check wehther there is at least one contig shared by the two clusters. 
@@ -147,6 +156,9 @@ delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.de
 show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords 
 show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  
 ```         
+The condition of a contig shared by two clusters.
+REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `contained/identity`, the two types of annotations. <br>
+
 5.3. Merge pass LEP and REP contigs into one contigs.<br>
 ``` 
 popins merge -c LEP_REP.fa <br>
