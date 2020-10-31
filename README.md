@@ -60,14 +60,26 @@ makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id<br>
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
 a. Contigs can be added to the current cluster if they are fully contained with >99% identity and covered >80% of the aligned cluster. <br>
 b. If the coverage of the current cluster is under 80%, we record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
-c. Obatain the contigs that satisy several contiditions. The pass contigs can be added to the current cluster. <br>
-Pass_contigs.py
-
+c. Obatain the contigs that satisy several contiditions. The pass contigs need to be added to the current cluster.<br>
+Pass_contigs.py<br>
+ 
 •	Merge left-end placed and right-end placed contigs into a longer insertion<br>
+a. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
 nucmer -f  -p align_info left_placed.fa  right_placed.fa<br>
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta<br>
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br>
-popins merge -c left_right.fa<br>
+b. Obtain 
+
+Note: 
+        nucmer -t 18 -p "Lrep_Rcluster" "cluster/"$right".fa" "rep/"$left".fa"
+        nucmer -t 18 -p "Rrep_Lcluster" "cluster/"$left".fa"  "rep/"$right".fa"
+        delta-filter  -r -q -g "Lrep_Rcluster"".delta" >"Lrep_Rcluster""_filter.delta"
+        delta-filter  -r -q -g "Rrep_Lcluster"".delta" >"Rrep_Lcluster""_filter.delta"
+        show-coords -H -T -l -c -o "Lrep_Rcluster""_filter.delta" > "Lrep_Rcluster"".coords"
+        show-coords -H -T -l -c -o "Rrep_Lcluster""_filter.delta" > "Rrep_Lcluster"".coords"
+        
+c. Merge contigs merge  two contigs were merged
+popins merge -c left_right.fa <br>
 
 •	Remove the redundancy of placed contigs<br>
 makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
@@ -76,4 +88,18 @@ blastn -db all_placed_Id -query all_placed.fa -outfmt 6 -max_target_seqs 1  -max
 •	Cluster the unplaced contigs<br>
 cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
 
+# Additional programs used to analyze CPG  <br>
+•	Annotate placed contigs <br>
+vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz <br>
+
+•	Compare with other genomes <br>
+bwa index -p other_genome_Id  other_genome.fa <br>
+bwa mem other_genome_Id CPG.fa > alignment.sam <br>
+
+•	Call variants  <br>
+bwa index -p new_ref_Id  new_ref.fa <br>
+bwa mem new_ref_Id read1.fq read2.fq > alignment.sam <br>
+java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=alignment.markdup.txt <br>
+java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam <br>
+gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile <br>
 
