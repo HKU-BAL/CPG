@@ -38,7 +38,7 @@ samtools view -h -F 2304 readtocontig.sam  | samtools sort -n -O bam | bedtools 
 samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 in a{ print $0 ; delete a[$1]; next }' readtocontig.txt <( samtools view alignedmate_GRCh38.sam )) | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"}{print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" | sort > pass_mates.txt<br>
 join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt<br>
 
-### 3.	Examine links to contig ends only, and filter based on described unambiguity criteria<br> 
+### 3.	Examine links to contig ends only, and filter based on unambiguity criteria<br> 
 Place_region.py<br> 
 
 ### 4. Extracted contig ends and GRCh38 regions with samtools faidx<br> 
@@ -48,9 +48,9 @@ samtools faidx GRCh38_no_alt.fa Place_region > GRCh38_Region.fa<br>
 nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_contig.fa<br>
 delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br> 
 
-### 6. Obtain BEP/LEP/REP/ contigs and the corresponding placedment positions  <br> 
+### 6. Obtain BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
 Contig_type.py <br> 
-Please remove contigs that the both end aligned to reference from the LEP/REP file. <br>
+Please remove contigs that the both end aligned to reference from the LEP/REP file. The remaining contigs are unplaced. <br>
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
@@ -82,7 +82,6 @@ b. Classfiy the alignment result into four types:<br>
 **Contained** (the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
 **Overlap** (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
 **Partially map** (the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
-Users can adjust the values of identity_cutoff, coverage_cutoff, minimun_cov_cutoff based on characteristics of contigs.<br>
 **Noted:** <br>
 For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
 nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
@@ -119,5 +118,5 @@ java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=al
 java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam <br>
 gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile <br>
 
-### 4. Align placed contigs to Pfam dataset.
+### 4. Align contigs to Pfam dataset.
 hmmscan --tblout Pfam-A.hmm 
