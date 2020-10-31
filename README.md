@@ -89,7 +89,7 @@ popins merge -c LEP_REP.fa <br>
 
 ## 6. Remove the redundancy of placed contigs<br>
 makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
-blastn -db all_placed_Id -query all_placed.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv<br>
+blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident slen qlen length qstart qend sstart send mismatch gapopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv<br>
 
 ## 7. Cluster the unplaced contigs<br>
 cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
