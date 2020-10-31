@@ -19,11 +19,12 @@ bwa index -p ref GRCh38_primary.fa <br>
 bwa mem ref read1.fq read2.fq > alignment.sam
  
 ### 2. Extract unaligned reads and corresponding mates <br>
+``` 
 samtools fastq -f 12 alignment.sam -1 R1_Unalignedmate.fq  -2 R2_Unalignedmate.fq  <br> 
 samtools fastq -f 68 -F 8 alignment.sam > R1_alignedmate.fq <br>
 samtools fastq -f 132 -F 8 alignment.sam > R2_alignedmate.fq <br>
 samtools view -f 8 -F 4 alignment.sam > alignedmate_GRCh38.sam <br>
- 
+``` 
 ### 3. Assemble unaligned reads into contigs <br>
 Megahit -r R1_Unalignedmate.fq , R2_Unalignedmate.fq, R1_alignedmate.fq, R2_alignedmate.fq  -o sample_1 <br>
  
