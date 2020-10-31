@@ -76,7 +76,7 @@ b. Classfiy the alignment result into four types:<br>
 **Partially map** (the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
 Users can adjust the values of identity_cutoff, coverage_cutoff, minimun_cov_cutoff based on characteristics of contigs.<br>
 Note: <br>
->For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
+ For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
 >nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
 >nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
 >delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta<br>
