@@ -2,7 +2,7 @@
 # Introduction <br> 
 The current human reference genome, GRCh38, is built from several individuals, most of whom are of Caucasian and African ancestry, which limits its usefulness for genomic analyses of distinct populations. For example, some population-specific variants cannot be detected when comparing genomes with the reference. Therefore, in recent years, the importance of capturing and representing sequencing data from diverse populations has been emphasized.  <br>
 An ideal way to address the limitation is to create a pan-genome, a representation of both the core and variably distributed genomes of a species. Due to the computation complexity of assembling many deeply sequenced human genomes de novo and combining them into a genome and just a few gaps in GRCh38, we focused on finding large insertions, which made pan-genome assemble feasible.<br>
-Firstly, we aligned the sequencing reads of 486 Han Chinese to the GRCh38.p13 reference genome individually and gained reads that could not be mapped to the reference genome. The unaligned reads were assembled into contigs (continuous sequences). Any contigs identified as contaminants or mapped to GRCh38 were eliminated. Based on the alignment positions of contigs’ reads and mates to GRCh38, we classify these contigs into two types: placed and unplaced ones. The exact insertion breakpoints of the placed contigs were determined and the placed contigs were then separated into three parts: right-end-placed (REP), left-end-placed (LEP) and both-end-placed (BEP). Secondly, we compared the placed contigs against one another and clustered together the similar contigs that placed close to each other. Unplaced contigs aligned closely to the placed ones with high identities were also included in the placed clusters. The remaining unplaced contigs were clustered by the cd-hit-est method. <br>
+Firstly, we aligned the sequencing reads of 486 Han Chinese to the GRCh38.p13 reference genome individually and gained reads that could not be mapped to the reference genome. The unaligned reads were assembled into contigs (continuous sequences). Any contigs identified as contaminants or mapped to GRCh38 were eliminated. Based on the alignment positions of contigs’ reads and mates to GRCh38, we classified these contigs into two types: placed and unplaced ones. The exact insertion breakpoints of the placed contigs were determined and the placed contigs were then separated into three parts: right-end-placed (REP), left-end-placed (LEP) and both-end-placed (BEP). Secondly, we compared the placed contigs against one another and clustered together the similar contigs that placed close to each other. Unplaced contigs aligned closely to the placed ones with high identities were also included in the placed clusters. The remaining unplaced contigs were clustered by the cd-hit-est method. <br>
 
 # Data format <br> 
 The name format of raw reads is Prefix+"_"+read_ID+"_"+sample_ID, like K14_17534_T1203 <br> 
@@ -68,11 +68,11 @@ makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id<br>
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
 a. Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster. <br>
-   FIle_name: Other_type_contigs.txt, file_format: Cluster_ID+'\t"+contig_ID
+   FIle_name: Ensure_contigs.txt, file_format: Cluster_ID+'\t"+contig_ID<br>
 b. If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
-   Format: Cluster_ID+'\t"+contig_ID
-c. Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster.<br>
-Pass_contigs.py<br>
+   Format: Cluster_ID+'\t"+contig_ID<br>
+c. Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster. (in pass_contigs.txt) <br>
+Pass_contigs.py<br> 
 d. Add other types of contigs into the current cluster (contigs from a and c)<br>
 Move_contigs.py<br>
 
@@ -99,7 +99,7 @@ show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluste
 c. Merge pass LEP and REP contigs into one contigs.<br>
 popins merge -c LEP_REP.fa <br>
 
-d. Move reads with sev
+d. Move reads with sev<br>
 
 ### 6. Remove the redundancy of placed contigs<br>
 makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
