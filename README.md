@@ -5,77 +5,77 @@
 bwa index -p ref GRCh38_primary.fa <br>
 bwa mem ref read1.fq read2.fq > alignment.sam
  
-•	Extract unaligned reads and corresponding mates <br>
+## 2. Extract unaligned reads and corresponding mates <br>
 samtools fastq -f 12 alignment.sam -1 R1_Unalignedmate.fq  -2 R2_Unalignedmate.fq  <br> 
 samtools fastq -f 68 -F 8 alignment.sam > R1_alignedmate.fq <br>
 samtools fastq -f 132 -F 8 alignment.sam > R2_alignedmate.fq <br>
 samtools view -f 8 -F 4 alignment.sam > alignedmate_GRCh38.sam <br>
  
-•	Assemble unaligned reads into contigs <br>
+## 3. Assemble unaligned reads into contigs <br>
 Megahit -r R1_Unalignedmate.fq , R2_Unalignedmate.fq, R1_alignedmate.fq, R2_alignedmate.fq  -o sample_1 <br>
  
-•	Remove contaminations and contigs aligned to reference <br>
+## 4. 	Remove contaminations and contigs aligned to reference <br>
 makeblastdb -in contaminations.fa -dbtype nucl -out contamination <br>
 blastn -db contamination -query contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  contig_contamination.tsv <br>
 makeblastdb -in GRCh38_alt.fa -dbtype nucl -out ref_alt_Id <br>
 blastn -db ref_alt_Id -query contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  contig_ref.tsv <br>
  
 # Step2. Positioning of contigs in GRCh38  <br>
-•	Align reads to contigs <br>
+## 1.	Align reads to contigs <br>
 bowtie2-build filteredcontig.fa contig_Id<br>
 bowtie2 -x contig_Id -U R1_alignedmate.fq, R2_alignedmate.fq  -S readtocontig.sam<br>
  
-•	Determine the placement region by reads and mates<br>
+## 2. Determine the placement region by reads and mates<br>
 samtools view -h -F 2304 readtocontig.sam  | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"} {print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" |sort > readtocontig.txt<br>
 samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 in a{ print $0 ; delete a[$1]; next }' readtocontig.txt <( samtools view alignedmate_GRCh38.sam )) | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"}{print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" | sort > pass_mates.txt<br>
 join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt<br>
 
-•	Examine links to contig ends only, and filter based on described unambiguity criteria<br> 
+## 3.	Examine links to contig ends only, and filter based on described unambiguity criteria<br> 
 Place_region.py<br> 
 
-•	Extracted contig ends and GRCh38 regions with samtools faidx<br> 
+## 4. Extracted contig ends and GRCh38 regions with samtools faidx<br> 
 samtools faidx GRCh38_no_alt.fa Place_region > GRCh38_Region.fa<br> 
 
-•	Align contigs to the region determined by the linking mates <br>
+## 5. Align contigs to the region determined by the linking mates <br>
 nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_contig.fa<br>
 delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br> 
 
-•	Obtain BEP/LEP/REP/ contigs and the corresponding placedment positions  <br> 
+## 6. Obtain BEP/LEP/REP/ contigs and the corresponding placedment positions  <br> 
 Contig_type.py <br> 
 Please remove contigs that the both end aligned to reference from the LEP/REP file. <br>
 
 # Step3. Cluster placed contigs <br>
-•	Cluster placed contigs <br>
+## 1.	Cluster placed contigs <br>
 Bedtools sort -i  placed_contigs.bed >  placed_contigs.sorted.bed <br>
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed <br>
 
-•	Choose the longest one as the representatives and get the corresponding clusters <br>
+## 2. Choose the longest one as the representatives and get the corresponding clusters <br>
 Rep_obtain.py <br>
 
-•	Remove contigs with no alignments to representatives <br>
+## 3. Remove contigs with no alignments to representatives <br>
 nucmer -p align_info  rep.fa cluster.fa<br>
 
-•	Align other types of contigs to sequences in current clusters <br>
+## 4. Align other types of contigs to sequences in current clusters <br>
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id<br>
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
-a. Contigs can be added to the current cluster if they are fully contained with >99% identity and covered >80% of the aligned cluster. <br>
-b. If the coverage of the current cluster is under 80%, we record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
-c. Obatain the contigs that satisy several contiditions. The pass contigs need to be added to the current cluster.<br>
+### a. Contigs can be added to the current cluster if they are fully contained with >99% identity and covered >80% of the aligned cluster. <br>
+### b. If the coverage of the current cluster is under 80%, we record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
+### c. Obatain the contigs that satisy several contiditions. The pass contigs need to be added to the current cluster.<br>
 Pass_contigs.py<br>
  
-•	Merge left-end placed and right-end placed contigs into a longer insertion<br>
-a. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
+## 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
+### a. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
 nucmer -f  -p align_info left_placed.fa  right_placed.fa<br>
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta<br>
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br>
 
-b. CLassfiy the alignment result into four types:
-* Identity *: awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt<br>
-Contained identity (the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
-Overlap (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
-Partially map(the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
+### b. CLassfiy the alignment result into four types:
+#### Identity : awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt<br>
+#### Contained identity (the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
+#### Overlap (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
+#### Partially map(the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
 Users can adjust the values of identity_cutoff, coverage_cutoff, minimun_cov_cutoff based on characteristics of contigs.<br>
-Note: <br>
+#### Note: <br>
 For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
         nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
         nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
@@ -84,7 +84,7 @@ For the fourth situation, please further check wehther there is at least one con
         show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords<br>
         show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  <br>      
         
-c. Merge pass LEP and REP contigs.
+### c. Merge pass LEP and REP contigs.
 popins merge -c LEP_REP.fa <br>
 
 •	Remove the redundancy of placed contigs<br>
