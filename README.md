@@ -67,14 +67,14 @@ delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br>
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
-1.1  Get the bed file (placed_contigs.sorted.bed)<br>
+1.1.  Get the bed file (placed_contigs.sorted.bed)<br>
 ``` 
 For BEP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed 
 For LEP/REP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"b[1],"-";  else print $2,$7-1,$8,$1"_"b[1],"+"}' LEP/REP_folder/* |bedtools sort -i > LEP/REP_contigs.bed
 ``` 
-1.2  Merge contigs in same type.<br>
+1.2.  Merge contigs in same type.<br>
 ``` 
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed 
 ``` 
@@ -86,13 +86,13 @@ bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_cont
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
 ### 4. Add other types of contigs to sequences in current clusters <br>
-4.1  Align contigs to sequences in the clusters.<br>
+4.1.  Align contigs to sequences in the clusters.<br>
 ``` 
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id 
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 ``` 
-4.2  Obtain contigs that can be added to the clusters.<br> 
+4.2.  Obtain contigs that can be added to the clusters.<br> 
  
 &ensp;&ensp;Two types of contigs:
 ``` 
@@ -103,18 +103,18 @@ awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}'
 &ensp;&ensp;&ensp;&ensp;Pass_contigs.py <br> 
 &ensp;&ensp;&ensp;&ensp;Output name: pass_contigs.txt
 
-4.3  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
+4.3.  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
 &ensp;&ensp;Move_contigs.py <br>
 
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
-5.1 If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
+5.1. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
 ``` 
 nucmer -f  -p align_info left_placed.fa  right_placed.fa 
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta 
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords 
 ``` 
 
-5.2 Classfiy the alignment result into four types:<br>
+5.2. Classfiy the alignment result into four types:<br>
 ``` 
 **Identity** : awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt 
 **Contained** :(the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt 
