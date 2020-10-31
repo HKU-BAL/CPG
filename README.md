@@ -89,9 +89,9 @@ show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br
 
 b. Classfiy the alignment result into four types:<br>
 **Identity** : awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt<br>
-**Contained** (the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
-**Overlap** (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
-**Partially map** (the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
+**Contained** :(the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
+**Overlap**: (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
+**Partially map**: (the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
 **Noted:** <br>
 For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
 nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
@@ -129,14 +129,16 @@ java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=al
 java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam<br>
 gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile<br>
 
-### 2. Align novel sequences of 90 Han Chinese to common sequences <br>
+### 3. Align unaligned reads of 486 individuals to common sequences <br>
+bwa index -p common_seq_id  common_seq.fa<br>
+bwa mem common_seq_id unaligned_reads.fa > alignment.sam <br>
+samtools view -h  -F 2304  alignment.sam  | htsbox samview -pS - > Filter_aligned.paf  <br>
 
-
-### 3. Annotate placed contigs<br>
+### 4. Annotate placed contigs<br>
 vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz<br>
 
-### 4. Compare with other genomes<br>
+### 5. Compare with other genomes <br>
 bwa index -p other_genome_Id  other_genome.fa<br>
 bwa mem other_genome_Id CPG.fa > alignment.sam<br>
 
-### 3. 
+
