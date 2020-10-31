@@ -100,11 +100,11 @@ awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
 ``` 
 &ensp;&ensp;Get contigs that satisy two contiditions from the list of candidate contigs. <br> 
-&ensp;&ensp;&ensp;&ensp;Pass_contigs.py <br> 
-&ensp;&ensp;&ensp;&ensp;Output name: pass_contigs.txt
+&ensp;&ensp;Pass_contigs.py <br> 
+&ensp;&ensp; Output name: pass_contigs.txt
 
 4.3.  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
-&ensp;&ensp;Move_contigs.py <br>
+&ensp;&ensp;&ensp;&ensp;Move_contigs.py <br>
 
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
 5.1. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
