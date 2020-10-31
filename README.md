@@ -70,11 +70,11 @@ delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta<br>
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br>
 b. CLassfiy the alignment result into four types:
 Identity: awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt<br>
-Contained identity>= cutoff : awk '{OFS="\t"}{if ($7>=cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' *.coords |sort |uniq  > Contained.txt<br>
-Overlap: awk '{OFS="\t"}{if ($7>=90 && $11>=5&& $NF=="[END]") print $0}' *.coords |sort|uniq  > Overlap.txt<br>
-Partially map: awk '{OFS="\t"}{if (($10>=50 || $11>=50) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' *.coords|sort|uniq  > Part.txt<br>
+Contained identity>= cutoff : awk '{OFS="\t"}{if ($7>=cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
+Overlap: awk '{OFS="\t"}{if ($7>=90 && $11>=5&& $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
+Partially map: awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
 
-Note: 
+Note: <br>
 For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
         nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
         nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa<br>
