@@ -80,7 +80,7 @@ Please move contigs in BEP_contigs_all folder from the LEP/REP file to unplaced 
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
-1.1.  Get the bed file (placed_contigs.sorted.bed)<br>
+1.1.  Get the bed file (`placed_contigs.sorted.bed`)<br>
 ``` 
 For BEP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed 
