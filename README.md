@@ -92,12 +92,14 @@ awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed 
 ``` 
 ### 2. Choose the longest one as the representatives and get the corresponding clusters <br>
-&ensp;&ensp;Rep_obtain.py <br>
-
+``` 
+Rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_contigs.bed --path_rep save_rep_folder --path_contig save_cluster_folder
+``` 
 ### 3. Remove contigs with no alignments to representatives <br>
 ``` 
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
+Only save contigs that hit to representative (save folder: remain_cluster_folder) 
 ### 4. Add other types of contigs to sequences in current clusters <br>
 4.1.  Align contigs to sequences in the clusters.<br>
 ``` 
@@ -112,13 +114,15 @@ apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_co
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
 ``` 
-&ensp;&ensp;Get contigs that satisy two contiditions from the list of candidate contigs. <br> 
-&ensp;&ensp;Pass_contigs.py <br> 
-&ensp;&ensp; Output name: pass_contigs.txt
+&ensp;&ensp;Get contigs that satisy two contiditions from the list of candidate contigs <br> 
+```
+Pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
+``` 
 
 4.3.  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
-&ensp;&ensp;&ensp;&ensp;Move_contigs.py <br>
-
+```
+Move_contigs.py --ensure_contigs -Ensure_contigs.txt -pass_contigs pass_contigs.txt --cluster_folder remain_cluster_folder --contig_path othertype_contig_path
+```
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
 5.1. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
 ``` 
