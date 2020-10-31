@@ -65,13 +65,16 @@ nucmer -p align_info  rep.fa cluster.fa<br>
 
 ### 4. Align other types of contigs to sequences in current clusters <br>
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id<br>
-blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
+blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
+apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
 a. Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster. <br>
-b. If the coverage of the current cluster is under 80%, we record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
+   FIle_name: Other_type_contigs.txt, file_format: Cluster_ID+'\t"+contig_ID
+b. If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
+   Format: Cluster_ID+'\t"+contig_ID
 c. Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster.<br>
 Pass_contigs.py<br>
 d. Add other types of contigs into the current cluster (contigs from a and c)<br>
-
+Move_contigs.py<br>
 
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
 a. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
@@ -96,6 +99,8 @@ show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluste
 c. Merge pass LEP and REP contigs into one contigs.<br>
 popins merge -c LEP_REP.fa <br>
 
+d. Move reads with sev
+
 ### 6. Remove the redundancy of placed contigs<br>
 makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
 blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident slen qlen length qstart qend sstart send mismatch gapopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv<br>
@@ -105,18 +110,5 @@ If contig
 ### 7. Cluster the unplaced contigs<br>
 cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
 
-## Analysis CPG  <br>
-### 1. Annotate placed contigs <br>
-vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz <br>
 
-### 2.	Compare with other genomes <br>
-bwa index -p other_genome_Id  other_genome.fa <br>
-bwa mem other_genome_Id CPG.fa > alignment.sam <br>
-
-### 3.	Call variants  <br>
-bwa index -p new_ref_Id  new_ref.fa <br>
-bwa mem new_ref_Id read1.fq read2.fq > alignment.sam <br>
-java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=alignment.markdup.txt <br>
-java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam <br>
-gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile <br>
 
