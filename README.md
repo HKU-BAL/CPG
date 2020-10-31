@@ -140,6 +140,7 @@ awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDE
 ``` 
 
 Then, for the fourth alignment result, please further check wehther there is at least one contig shared by the two clusters. 
+``` 
 nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   
 nucmer -p Rrep_Lcluster LEP_cluster.fa  REP_rep.fa 
 delta-filter  -r -q -g LEP_rep_REP_cluster.delta > LEP_rep_REP_cluster_filter.delta 
