@@ -94,18 +94,20 @@ blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident 
 ## 7. Cluster the unplaced contigs<br>
 cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
 
-# Additional programs used to analyze CPG  <br>
-•	Annotate placed contigs <br>
+# Analysis CPG  <br>
+## 1. Annotate placed contigs <br>
 vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz <br>
 
-•	Compare with other genomes <br>
+## 2.	Compare with other genomes <br>
 bwa index -p other_genome_Id  other_genome.fa <br>
 bwa mem other_genome_Id CPG.fa > alignment.sam <br>
 
-•	Call variants  <br>
+## 3.	Call variants  <br>
 bwa index -p new_ref_Id  new_ref.fa <br>
 bwa mem new_ref_Id read1.fq read2.fq > alignment.sam <br>
 java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=alignment.markdup.txt <br>
 java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam <br>
 gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile <br>
 
+## 4. Align placed contigs to Pfam dataset.
+hmmscan --tblout Pfam-A.hmm 
