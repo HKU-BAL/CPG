@@ -116,4 +116,27 @@ If contig
 cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
 
 
+## Step4. Analysis of CPG <br>
+### 1. Component of CPG  <br>
+The workflow provides two classification method.<br>
+1. Placed / Unplaced <br>
+2. Common / Individual-sepcific <br>
 
+### 2. Call variants <br>
+bwa index -p new_ref_Id  new_ref.fa<br>
+bwa mem new_ref_Id read1.fq read2.fq > alignment.sam<br>
+java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=alignment.markdup.txt<br>
+java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam<br>
+gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile<br>
+
+### 2. Align novel sequences of 90 Han Chinese to common sequences <br>
+
+
+### 3. Annotate placed contigs<br>
+vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz<br>
+
+### 4. Compare with other genomes<br>
+bwa index -p other_genome_Id  other_genome.fa<br>
+bwa mem other_genome_Id CPG.fa > alignment.sam<br>
+
+### 3. 
