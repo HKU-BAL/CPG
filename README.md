@@ -50,7 +50,7 @@ samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 
 join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt 
 ``` 
 ### 3.	Examine links to contig ends only, and filter based on unambiguity criteria<br> 
-Place_region.py<br> 
+&nbsp;&nbsp;Place_region.py<br> 
 
 ### 4. Extracted contig ends and GRCh38 regions with samtools faidx<br> 
 ``` 
@@ -62,8 +62,8 @@ nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_con
 delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br> 
 ``` 
 ### 6. Obtain BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
-Contig_type.py <br> 
-Please remove contigs that the both end aligned to reference from the LEP/REP file. The remaining contigs are unplaced. <br>
+&nbsp;&nbsp;Contig_type.py <br> 
+&nbsp;&nbsp;Please remove contigs that the both end aligned to reference from the LEP/REP file. The remaining contigs are unplaced. <br>
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
@@ -79,7 +79,7 @@ awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed 
 ``` 
 ### 2. Choose the longest one as the representatives and get the corresponding clusters <br>
-Rep_obtain.py <br>
+&nbsp;&nbsp;Rep_obtain.py <br>
 
 ### 3. Remove contigs with no alignments to representatives <br>
 ``` 
@@ -100,11 +100,11 @@ awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
 ``` 
 Get contigs that satisy two contiditions from the list of candidate contigs. <br> 
-Pass_contigs.py <br> 
-File name: pass_contigs.txt
+&nbsp;&nbsp;Pass_contigs.py <br> 
+&nbsp;&nbsp;File name: pass_contigs.txt
 
 4.3  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
-Move_contigs.py <br>
+&nbsp;&nbsp;Move_contigs.py <br>
 
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
 5.1 If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
