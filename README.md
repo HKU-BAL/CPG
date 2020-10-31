@@ -3,12 +3,16 @@
 # Introduction <br> 
 The current human reference genome, GRCh38, is built from several individuals, most of whom are of Caucasian and African ancestry, which limits its usefulness for genomic analyses of distinct populations. For example, some population-specific variants cannot be detected when comparing genomes with the reference. Therefore, in recent years, the importance of capturing and representing sequencing data from diverse populations has been emphasized.  <br>
 An ideal way to address the limitation is to create a pan-genome, a representation of both the core and variably distributed genomes of a species. Due to the computation complexity of assembling many deeply sequenced human genomes de novo and combining them into a genome and just a few gaps in GRCh38, we focused on finding large insertions, which made pan-genome assemble feasible.<br>
+
+
+# Workflow for construction of a Chinese Pan-genome
+![Workflow](http://www.bio8.cs.hku.hk/RNA/CPG_workflow.png)
 Firstly, we aligned the sequencing reads of 486 Han Chinese to the GRCh38.p13 reference genome individually and gained reads that could not be mapped to the reference genome. The unaligned reads were assembled into contigs (continuous sequences). Any contigs identified as contaminants or mapped to GRCh38 were eliminated. Based on the alignment positions of contigs’ reads and mates to GRCh38, we classified these contigs into two types: placed and unplaced ones. The exact insertion breakpoints of the placed contigs were determined and the placed contigs were then separated into three parts: right-end-placed (REP), left-end-placed (LEP) and both-end-placed (BEP). Secondly, we compared the placed contigs against one another and clustered together the similar contigs that placed close to each other. Unplaced contigs aligned closely to the placed ones with high identities were also included in the placed clusters. The remaining unplaced contigs were clustered by the cd-hit-est method. <br>
 
-# Data format <br> 
+# Construction <br> 
+## Data format <br> 
 The name format of raw reads is Prefix+"_"+read_ID+"_"+sample_ID, like K14_17534_T1203 <br> 
 
-# Construction <br> 
 ## Step1. Assembly and filtering of novel contigs <br>
 ### 1.	Align reads to reference <br>
 bwa index -p ref GRCh38_primary.fa <br>
