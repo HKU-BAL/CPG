@@ -2,7 +2,7 @@
  
 # Step1. Assembly and filtering of novel contigs <br>
 ## 1.	Align reads to reference <br>
-### bwa index -p ref GRCh38_primary.fa <br>
+bwa index -p ref GRCh38_primary.fa <br>
 bwa mem ref read1.fq read2.fq > alignment.sam
  
 •	Extract unaligned reads and corresponding mates <br>
