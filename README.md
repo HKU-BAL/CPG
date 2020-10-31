@@ -93,13 +93,15 @@ blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sse
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 ``` 
 4.2  Obtain contigs that can be added to the clusters.<br> 
-``` 
+ 
 Obtain two types of contigs:
+``` 
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
+``` 
 Get contigs that satisy two contiditions from the list of candidate contigs. 
 Pass_contigs.py 
-``` 
+
 4.3  Add other types of contigs into the current cluster (contigs from a and c)<br>
 Move_contigs.py <br>
 
