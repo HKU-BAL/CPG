@@ -66,11 +66,13 @@ nucmer -p align_info  rep.fa cluster.fa<br>
 ### 4. Align other types of contigs to sequences in current clusters <br>
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id<br>
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv<br>
-a. Contigs can be added to the current cluster if they are fully contained with >99% identity and covered >80% of the aligned cluster. <br>
+a. Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster. <br>
 b. If the coverage of the current cluster is under 80%, we record the ID of the current cluster and the contig ID. (in candidate_contigs.txt) <br>
-c. Obatain the contigs that satisy several contiditions. The pass contigs need to be added to the current cluster.<br>
+c. Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster.<br>
 Pass_contigs.py<br>
- 
+d. Add other types of contigs into the current cluster (contigs from a and c)<br>
+
+
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
 a. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
 nucmer -f  -p align_info left_placed.fa  right_placed.fa<br>
