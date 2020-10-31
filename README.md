@@ -67,14 +67,14 @@ Please remove contigs that the both end aligned to reference from the LEP/REP fi
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
-a. Get the bed file (placed_contigs.sorted.bed)<br>
+1.1 Get the bed file (placed_contigs.sorted.bed)<br>
 ``` 
 For BEP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed 
 For LEP/REP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"b[1],"-";  else print $2,$7-1,$8,$1"_"b[1],"+"}' LEP/REP_folder/* |bedtools sort -i > LEP/REP_contigs.bed
 ``` 
-b. Merge contigs in same type.<br>
+1.2 Merge contigs in same type.<br>
 ``` 
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed 
 ``` 
@@ -86,29 +86,30 @@ Rep_obtain.py <br>
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
 ### 4. Add other types of contigs to sequences in current clusters <br>
-a. Align contigs to sequences in the clusters.<br>
+4.1 Align contigs to sequences in the clusters.<br>
 ``` 
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id 
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 ``` 
-b. Obtain contigs that satify conditions.<br> 
-&ensp;&ensp;Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. These contigs will be added to the current cluster.  <br>
-&ensp;&ensp;&ensp;&ensp;File_name: Ensure_contigs.txt, file_format: Cluster_ID+'\t"+contig_ID  <br>
-• If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. (in candidate_contigs.txt)  <br>
-  Format: Cluster_ID+'\t"+contig_ID <br>
-• Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster. (in pass_contigs.txt)  <br>
-  Pass_contigs.py <br>
-c. Add other types of contigs into the current cluster (contigs from a and c)<br>
+4.2 Obtain contigs that satify conditions.<br> 
+&ensp;&ensp;Obtain contigs that are fully contained with >99% identity and covered >80% of the aligned cluster. 
+&ensp;&ensp;These contigs will be added to the current cluster. File name: Ensure_contigs.txt; File format: Cluster_ID+'\t"+contig_ID  <br>
+&ensp;&ensp;If the coverage of the current cluster is under 80%, record the ID of the current cluster and the contig ID. <br>
+&ensp;&ensp;File name: candidate_contigs.txt; Fileformat: Cluster_ID+'\t"+contig_ID <br>
+&ensp;&ensp;Obatain the contigs that satisy several contiditions. The pass contigs would  be added to the current cluster.<br>
+&ensp;&ensp;Pass_contigs.py <br>
+&ensp;&ensp;Output file name: pass_contigs.txt
+4.3 Add other types of contigs into the current cluster (contigs from a and c)<br>
 Move_contigs.py <br>
 
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
-a. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
+5.1 If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
 nucmer -f  -p align_info left_placed.fa  right_placed.fa<br>
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta<br>
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br>
 
-b. Classfiy the alignment result into four types:<br>
+5.2 Classfiy the alignment result into four types:<br>
 **Identity** : awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt<br>
 **Contained** :(the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
 **Overlap**: (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
