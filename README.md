@@ -70,10 +70,10 @@ delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta<br>
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords<br>
 b. CLassfiy the alignment result into four types:
 Identity: awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > Identity.txt<br>
-Contained identity>= cutoff : awk '{OFS="\t"}{if ($7>=cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
-Overlap: awk '{OFS="\t"}{if ($7>=90 && $11>=5&& $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
-Partially map: awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
-
+Contained identity (the default value of identity_cutoff is 97): awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > Contained.txt<br>
+Overlap (the default value of identity_cutoff is 90 and the default value of minimun_cov_cutoff is 5 ): awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > Overlap.txt<br>
+Partially map(the default value of coverage_cutoff is 50): awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > Part.txt<br>
+Users can adjust the values of identity_cutoff, coverage_cutoff, minimun_cov_cutoff based on characteristics of contigs.<br>
 Note: <br>
 For the fourth situation, please further check wehther there is at least one contig shared by the two clusters.<br>
         nucmer -p Lrep_Rcluster  REP_cluster.fa LEP_rep.fa   <br>
