@@ -153,13 +153,13 @@ delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.de
 show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords 
 show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  
 ```         
-The condition of a contig shared by two clusters:<br>
-REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `contained/identity`, the two types of annotations. Other alignments cannot be saved. <br>
+Only REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `contained/identity` can the alignment result be saved. <br>
 
-5.3. Merge pass LEP and REP contigs into one contigs.<br>
+5.3. Merge overlaping LEP and REP representative into one contigs.<br>
 ``` 
 popins merge -c LEP_REP.fa <br>
 ``` 
+
 5.4. Move reads with sev<br>
 
 ### 6. Remove the redundancy of placed contigs
