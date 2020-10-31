@@ -99,7 +99,7 @@ Rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_contigs.bed
 ``` 
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
-Only save contigs that hit to representative (save folder: remain_cluster_folder) 
+Only save contigs that hit to representative (save folder: remain_cluster_folder) <br>
 ### 4. Add other types of contigs to sequences in current clusters <br>
 4.1.  Align contigs to sequences in the clusters.<br>
 ``` 
@@ -108,13 +108,12 @@ blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sse
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 ``` 
 4.2.  Obtain contigs that can be added to the clusters.<br> 
- 
-&ensp;&ensp;Two types of contigs:
+Two types of contigs:
 ``` 
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
 ``` 
-&ensp;&ensp;Get contigs that satisy two contiditions from the list of candidate contigs <br> 
+Get contigs that satisy two contiditions from the list of candidate contigs <br> 
 ```
 Pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
 ``` 
