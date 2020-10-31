@@ -59,7 +59,12 @@ Please remove contigs that the both end aligned to reference from the LEP/REP fi
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
-Bedtools sort -i  placed_contigs.bed >  placed_contigs.sorted.bed <br>
+a. Get the bed file (placed_contigs.sorted.bed)<br>
+For BEP contigs,<br>
+awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed<br>
+For LEP/REP contigs,<br>
+awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"b[1],"-";  else print $2,$7-1,$8,$1"_"b[1],"+"}' LEP/REP_folder/* |bedtools sort -i > LEP/REP_contigs.bed<br>
+b. Merge contigs in same type.<br>
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed <br>
 
 ### 2. Choose the longest one as the representatives and get the corresponding clusters <br>
