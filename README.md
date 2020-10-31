@@ -99,7 +99,7 @@ Rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_contigs.bed
 ``` 
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
-Only save contigs that hit to representative (save folder: remain_cluster_folder) <br>
+Only save contigs that hit to representative (save folder: `remain_cluster_folder`) <br>
 ### 4. Add other types of contigs to sequences in current clusters <br>
 4.1.  Align contigs to sequences in the clusters.<br>
 ``` 
