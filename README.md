@@ -38,7 +38,7 @@ makeblastdb -in GRCh38_alt.fa -dbtype nucl -out ref_alt_Id
 blastn -db ref_alt_Id -query contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1  -out  contig_ref.tsv 
 ```  
 ## Step2. Positioning of contigs in GRCh38  <br>
-### 1.	Align reads to contigs <br>
+### 1.	Align reads to filtered contigs <br>
 ``` 
 bowtie2-build filteredcontig.fa contig_Id 
 bowtie2 -x contig_Id -U R1_alignedmate.fq, R2_alignedmate.fq  -S readtocontig.sam 
@@ -50,20 +50,33 @@ samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 
 join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt 
 ``` 
 ### 3.	Examine links to contig ends only, and filter based on unambiguity criteria<br> 
-&ensp;&ensp;Place_region.py<br> 
-
+``` 
+samtools faidx contig_ID.fa 
+Place_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
+``` 
 ### 4. Extracted contig ends and GRCh38 regions with samtools faidx<br> 
 ``` 
-samtools faidx GRCh38_no_alt.fa Place_region > GRCh38_Region.fa 
+For files in folder (unambiguous_placed_regions_folder/LEP), 
+awk '{print $2:$3"-"$4}' unambiguous_placed_regions_folder/LEP/contig_ID.txt > contig_ID_LEP_region.txt
+samtools faidx GRCh38_no_alt.fa contig_ID_LEP_region.txt > GRCh38_Region.fa 
+samtools faidx contig_ID.fa $contig_ID":0-100" > Lep_contig.fa
+
+For files in folder (unambiguous_placed_regions_folder/REP), 
+awk '{print $2:$3"-"$4}' unambiguous_placed_regions_folder/REP/contig_ID.txt > contig_ID_REP_region.txt
+samtools faidx GRCh38_no_alt.fa contig_ID_REP_region.txt > GRCh38_Region.fa 
+contig_REP_start=`expr $contig_length - 100`
+samtools faidx contig_ID.fa $contig_ID":"$contig_REP_start"-"$contig_length > Rep_contig.fa
 ``` 
 ### 5. Align contigs to the region determined by the linking mates <br>
 ``` 
-nucmer  --maxmatch -l 15 -b 1 -c 15 -p alignment_contig GRCh38Regions.fa end_contig.fa<br>
-delta-filter -q -r -o 0 -g aliged_info.delta > filtered_info.delta <br> 
+nucmer  --maxmatch -l 15 -b 1 -c 15 -p contig_ID GRCh38_Regions.fa Rep_contig.fa/Rep_contig.fa  
+delta-filter -q -r -o 0 -g contig_ID.delta > filtered_info.delta 
 ``` 
 ### 6. Obtain BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
-&ensp;&ensp;Contig_type.py <br> 
-&ensp;&ensp;Please remove contigs that the both end aligned to reference from the LEP/REP file. The remaining contigs are unplaced. <br>
+``` 
+Contig_type.py  --ref_name_id GRCH38.fa.fai --alignment_info PATH_filtered_info.delta  --LEP_contigs LEP_folder --REP_contigs REP_folder --BEP_contigs BEP_folder --BEP_contigs_all all_BEP_folder
+``` 
+Please move contigs in BEP_contigs_all folder from the LEP/REP file to unplaced file. And the remaining contigs are unplaced. <br>
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
@@ -131,11 +144,11 @@ delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.de
 show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords 
 show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  
 ```         
-c. Merge pass LEP and REP contigs into one contigs.<br>
+5.3. Merge pass LEP and REP contigs into one contigs.<br>
 ``` 
 popins merge -c LEP_REP.fa <br>
 ``` 
-d. Move reads with sev<br>
+5.4. Move reads with sev<br>
 
 ### 6. Remove the redundancy of placed contigs
 ``` 
