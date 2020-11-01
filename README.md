@@ -52,7 +52,7 @@ join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt
 ### 3.	Examine links to contig ends only, and filter based on unambiguity criteria<br> 
 ``` 
 samtools faidx contig_ID.fa 
-python Place_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
+python place_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
 ``` 
 ### 4. Extracted contig ends and GRCh38 regions with samtools faidx<br> 
 ``` 
@@ -74,7 +74,7 @@ delta-filter -q -r -o 0 -g contig_ID.delta > filtered_info.delta
 ``` 
 ### 6. Obtain BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
 ``` 
-python Contig_type.py  --ref_name_id GRCH38.fa.fai --alignment_info PATH_filtered_info.delta  --LEP_contigs LEP_folder --REP_contigs REP_folder --BEP_contigs BEP_folder --BEP_contigs_all all_BEP_folder
+python contig_type.py  --ref_name_id GRCH38.fa.fai --alignment_info PATH_filtered_info.delta  --LEP_contigs LEP_folder --REP_contigs REP_folder --BEP_contigs BEP_folder --BEP_contigs_all all_BEP_folder
 ``` 
 Please move contigs in BEP_contigs_all folder from the LEP/REP file to unplaced file. And the remaining contigs are unplaced. <br>
 
@@ -94,7 +94,7 @@ bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_cont
 ``` 
 ### 2. Choose the longest one as the representatives and get the corresponding clusters <br>
 ``` 
-python Rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_contigs.bed --path_rep save_rep_folder --path_contig save_cluster_folder
+python rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_contigs.bed --path_rep save_rep_folder --path_contig save_cluster_folder
 ``` 
 ### 3. Remove contigs with no alignments to representatives <br>
 ``` 
@@ -116,12 +116,12 @@ awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}'
 ``` 
 Get contigs that satisy two contiditions from the list of candidate contigs <br> 
 ```
-python Pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
+python pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
 ``` 
 
 4.3.  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
 ```
-Move_contigs.py --ensure_contigs -Ensure_contigs.txt -pass_contigs pass_contigs.txt --cluster_folder remain_cluster_folder --contig_path othertype_contig_path
+python move_contigs.py --ensure_contigs -Ensure_contigs.txt -pass_contigs pass_contigs.txt --cluster_folder remain_cluster_folder --contig_path othertype_contig_path
 ```
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
 5.1. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
@@ -187,12 +187,7 @@ cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
 ``` 
 
 ## Step4. Analysis of CPG <br>
-### 1. Component of CPG  <br>
-The workflow provides two classification method.<br>
-1. Placed / Unplaced <br>
-2. Common / Individual-sepcific <br>
-
-### 2. Call variants  
+### 1. Call variants  
 ``` 
 bwa index -p new_ref_Id  new_ref.fa<br>
 bwa mem new_ref_Id read1.fq read2.fq > alignment.sam<br>
@@ -200,17 +195,17 @@ java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=al
 java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam<br>
 gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile<br>
 ``` 
-### 3. Align unaligned reads of 486 individuals to common sequences 
+### 2. Align unaligned reads of 486 individuals to common sequences 
 ``` 
 bwa index -p common_seq_id  common_seq.fa<br>
 bwa mem common_seq_id unaligned_reads.fa > alignment.sam <br>
 samtools view -h  -F 2304  alignment.sam  | htsbox samview -pS - > Filter_aligned.paf  <br>
 ``` 
-### 4. Annotate placed contigs
+### 3. Annotate placed contigs
 ``` 
 vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz<br>
 ``` 
-### 5. Compare with other genomes
+### 4. Compare with other genomes
 ``` 
 bwa index -p other_genome_Id  other_genome.fa<br>
 bwa mem other_genome_Id CPG.fa > alignment.sam<br>
