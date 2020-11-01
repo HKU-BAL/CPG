@@ -52,7 +52,7 @@ join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt
 ### 3.	Examine links to contig ends only, and filter based on unambiguity criteria<br> 
 ``` 
 samtools faidx contig_ID.fa 
-Place_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
+python Place_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
 ``` 
 ### 4. Extracted contig ends and GRCh38 regions with samtools faidx<br> 
 ``` 
@@ -74,7 +74,7 @@ delta-filter -q -r -o 0 -g contig_ID.delta > filtered_info.delta
 ``` 
 ### 6. Obtain BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
 ``` 
-Contig_type.py  --ref_name_id GRCH38.fa.fai --alignment_info PATH_filtered_info.delta  --LEP_contigs LEP_folder --REP_contigs REP_folder --BEP_contigs BEP_folder --BEP_contigs_all all_BEP_folder
+python Contig_type.py  --ref_name_id GRCH38.fa.fai --alignment_info PATH_filtered_info.delta  --LEP_contigs LEP_folder --REP_contigs REP_folder --BEP_contigs BEP_folder --BEP_contigs_all all_BEP_folder
 ``` 
 Please move contigs in BEP_contigs_all folder from the LEP/REP file to unplaced file. And the remaining contigs are unplaced. <br>
 
