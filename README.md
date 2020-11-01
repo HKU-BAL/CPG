@@ -177,7 +177,9 @@ blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident 
 python deduplcate_placed.py  --alignment_path  all_placed_aligned.tsv  --BEP_bed  BEP_bed_path --LEP_bed  LEP_bed_path --REP_bed  REP_bed_path --pass_alignment  placed_aligned.update.tsv
 ``` 
 6.3 Generate the final placed representatives and clusters.<br> 
-
+``` 
+python final_ref.py  --placed_align_path final_aligned.txt --contigs_fai contigs.fa.fai --BEP_cluster_folder  BEP_cluster_updater/  --LEP_cluster_folder  LEP_cluster_update/  --REP_cluster_folder  REP_cluster_update/ --BEP_rep_folder  BEP_rep_update/ --LEP_rep_folder LEP_rep_update/  --REP_rep_folder REP_rep_update/  --BEP_cluster_update_folder  BEP_final_cluster/ --LEP_cluster_update_folder  LEP_final_cluster/  --REP_cluster_update_folder REP_final_cluster/ --BEP_rep_update_folder  BEP_final_rep/ --LEP_rep_update_folder LEP_final_rep/  --REP_rep_update_folder  REP_final_rep/
+``` 
 
 ### 7. Cluster the unplaced contigs<br>
 ``` 
