@@ -116,7 +116,7 @@ awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}'
 ``` 
 Get contigs that satisy two contiditions from the list of candidate contigs <br> 
 ```
-Pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
+python Pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
 ``` 
 
 4.3.  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
@@ -152,21 +152,24 @@ delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.de
 show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords 
 show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  
 ```         
-Only REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `contained/identity` can the alignment result be saved. <br>
+Only REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `CONTAINED/IDENTITY` can the alignment result be saved (in `updated_alignment_folder` folder). <br>
 
 5.3. Merge overlaping LEP and REP representative into one contigs.<br>
 ``` 
 popins merge -c LEP_REP.fa <br>
 ``` 
+Save files in `merged/` 
 
-5.4. Move reads with sev<br>
-
+5.4.  Update the the placed representatives and corresponding clusters. <br>
+``` 
+python update_ref.py --LEP_cluster_folder LEP_cluster_folder --REP_cluster_folder  --LEP_rep_folder LEP_rep/ --REP_rep_folder REP_rep/ --align_folder updated_alignment_folder/  --LEP_cluster_update_folder LEP_cluster_update/ --LEP_rep_update_folder LEP_rep_update --REP_cluster_update_folder REP_cluster_update/ --REP_rep_update_folder REP_rep_update/ --BEP_rep_folder BEP_rep/ --BEP_cluster_folder BEP_cluster/ --merged_contig_folder merged/
+``` 
 ### 6. Remove the redundancy of placed contigs
 ``` 
 makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
 blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident slen qlen length qstart qend sstart send mismatch gapopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv<br>
 ``` 
-If contig 
+ 
 
 
 ### 7. Cluster the unplaced contigs<br>
