@@ -153,7 +153,7 @@ show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluste
 show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  
 ```         
 Only REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `CONTAINED/IDENTITY` can the alignment result be saved 
-Results are saved in `updated_alignment_folder/final_part.txt`, file format: `LEP_rep\tREP_rep\tNew_rep.{r/l}`. <br>
+Results are saved in `updated_alignment_folder/final_part.txt`, file format: `LEP_rep REP_rep New_rep.{r/l}`. <br>
 
 5.3. Merge overlaping LEP and REP representative into one contigs.<br>
 ``` 
@@ -167,11 +167,16 @@ python update_ref.py --LEP_cluster_folder LEP_cluster_folder --REP_cluster_folde
 ``` 
 
 ### 6. Remove the redundancy of placed contigs
+6.1 Align placed contigs against each other. <br>
 ``` 
-makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
-blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident slen qlen length qstart qend sstart send mismatch gapopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv<br>
+makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id 
+blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident slen qlen length qstart qend sstart send mismatch gapopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv
 ``` 
-Obtain the best hit result
+6.2 Obtain contigs that can be merged together  <br>
+``` 
+python deduplcate_placed.py  --alignment_path  all_placed_aligned.tsv  --BEP_bed  BEP_bed_path --LEP_bed  LEP_bed_path --REP_bed  REP_bed_path --pass_alignment  placed_aligned.update.tsv
+``` 
+6.3 
 
 
 ### 7. Cluster the unplaced contigs<br>
