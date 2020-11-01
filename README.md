@@ -152,7 +152,8 @@ delta-filter  -r -q -g REP_rep_LEP_cluster.delta > REP_rep_LEP_cluster_filter.de
 show-coords -H -T -l -c -o LEP_rep_REP_cluster_filter.delta > LEP_rep_REP_cluster_filter.coords 
 show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluster_filter.coords  
 ```         
-Only REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `CONTAINED/IDENTITY` can the alignment result be saved (in `updated_alignment_folder` folder). <br>
+Only REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `CONTAINED/IDENTITY` can the alignment result be saved 
+Results are saved in `updated_alignment_folder/final_part.txt`, file format: `LEP_rep\tREP_rep\tNew_rep.{r/l}`. <br>
 
 5.3. Merge overlaping LEP and REP representative into one contigs.<br>
 ``` 
@@ -164,12 +165,13 @@ Save files in `merged/`
 ``` 
 python update_ref.py --LEP_cluster_folder LEP_cluster_folder --REP_cluster_folder  --LEP_rep_folder LEP_rep/ --REP_rep_folder REP_rep/ --align_folder updated_alignment_folder/  --LEP_cluster_update_folder LEP_cluster_update/ --LEP_rep_update_folder LEP_rep_update --REP_cluster_update_folder REP_cluster_update/ --REP_rep_update_folder REP_rep_update/ --BEP_rep_folder BEP_rep/ --BEP_cluster_folder BEP_cluster/ --merged_contig_folder merged/
 ``` 
+
 ### 6. Remove the redundancy of placed contigs
 ``` 
 makeblastdb -in all_placed.fa -dbtype nucl -out all_placed_Id<br>
 blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident slen qlen length qstart qend sstart send mismatch gapopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  all_placed_aligned.tsv<br>
 ``` 
- 
+Obtain the best hit result
 
 
 ### 7. Cluster the unplaced contigs<br>
