@@ -94,7 +94,7 @@ bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_cont
 ``` 
 ### 2. Choose the longest one as the representatives and get the corresponding clusters <br>
 ``` 
-Rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_contigs.bed --path_rep save_rep_folder --path_contig save_cluster_folder
+python Rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_contigs.bed --path_rep save_rep_folder --path_contig save_cluster_folder
 ``` 
 ### 3. Remove contigs with no alignments to representatives <br>
 ``` 
@@ -163,7 +163,7 @@ Save files in `merged/`
 
 5.4.  Update the the placed representatives and corresponding clusters. <br>
 ``` 
-python update_ref.py --LEP_cluster_folder LEP_cluster_folder --REP_cluster_folder  --LEP_rep_folder LEP_rep/ --REP_rep_folder REP_rep/ --align_folder updated_alignment_folder/  --LEP_cluster_update_folder LEP_cluster_update/ --LEP_rep_update_folder LEP_rep_update --REP_cluster_update_folder REP_cluster_update/ --REP_rep_update_folder REP_rep_update/ --BEP_rep_folder BEP_rep/ --BEP_cluster_folder BEP_cluster/ --merged_contig_folder merged/
+python update_ref.py --LEP_folder LEP_folder/ --REP_folder  REP_folder/  --contigs_fai  contigs_fai_path  --LEP_cluster_folder LEP_cluster_folder --REP_cluster_folder  --LEP_rep_folder LEP_rep/ --REP_rep_folder REP_rep/ --align_folder updated_alignment_folder/  --LEP_cluster_update_folder LEP_cluster_update/ --LEP_rep_update_folder LEP_rep_update --REP_cluster_update_folder REP_cluster_update/ --REP_rep_update_folder REP_rep_update/ --BEP_rep_folder BEP_rep/ --BEP_cluster_folder BEP_cluster/ --merged_contig_folder merged/
 ``` 
 
 ### 6. Remove the redundancy of placed contigs
@@ -176,7 +176,7 @@ blastn -db all_placed_Id -query all_placed.fa -outfmt "6  qseqid sseqid  pident 
 ``` 
 python deduplcate_placed.py  --alignment_path  all_placed_aligned.tsv  --BEP_bed  BEP_bed_path --LEP_bed  LEP_bed_path --REP_bed  REP_bed_path --pass_alignment  placed_aligned.update.tsv
 ``` 
-6.3 
+6.3 Generate the final placed representatives and clusters.<br> 
 
 
 ### 7. Cluster the unplaced contigs<br>
