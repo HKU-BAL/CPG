@@ -54,7 +54,7 @@ join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt
 samtools faidx contig_ID.fa 
 python placed_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
 ``` 
-### 4. Extract contig ends and GRCh38 regions with samtools faidx<br> 
+### 4. Extract contig ends and GRCh38 regions<br> 
 ``` 
 # For files in unambiguous_placed_regions_folder/LEP folder, 
 awk '{print $2":"$3"-"$4}' unambiguous_placed_regions_folder/LEP/contig_ID.txt > contig_ID_LEP_region.txt
