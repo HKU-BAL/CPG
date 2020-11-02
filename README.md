@@ -56,16 +56,11 @@ python placed_region.py --mates_region  mates_region.txt  --fai contig_fai_path 
 ``` 
 ### 4. Extract contig ends and GRCh38 regions<br> 
 ``` 
-# For files in unambiguous_placed_regions_folder/LEP folder, 
-awk '{print $2":"$3"-"$4}' unambiguous_placed_regions_folder/LEP/contig_ID.txt > contig_ID_LEP_region.txt
+# For files in unambiguous_placed_regions_folder/Placed folder, 
+awk '{print $2":"$3"-"$4}' unambiguous_placed_regions_folder/Placed/contig_ID.txt > contig_ID_LEP/REP_region.txt
 samtools faidx GRCh38_no_alt.fa contig_ID_LEP_region.txt > GRCh38_Region.fa 
-samtools faidx contig_ID.fa $contig_ID":0-100" > LEP_contig.fa
+samtools faidx contig_ID.fa region > LEP/REP_contig.fa
 
-# For files in unambiguous_placed_regions_folder/REP folder, 
-awk '{print $2:$3"-"$4}' unambiguous_placed_regions_folder/REP/contig_ID.txt > contig_ID_REP_region.txt
-samtools faidx GRCh38_no_alt.fa contig_ID_REP_region.txt > GRCh38_Region.fa 
-contig_REP_start=`expr $contig_length - 100`
-samtools faidx contig_ID.fa $contig_ID":"$contig_REP_start"-"$contig_length > REP_contig.fa
 ``` 
 ### 5. Align contigs to the region determined by the linking mates <br>
 ``` 
@@ -132,22 +127,11 @@ delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta
 show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords  
 ``` 
 Classify the alignment result into four situtaions:<br>
-situation1. The two representatives are identical <br>
-``` 
-awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > identity.coords
-``` 
-situation2. One representative is contained, the identity cutoff is over 90%  <br>
-``` 
-awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > contained.coords
-``` 
-situation3. The ends of two representatives overlap in the correct arrangement and orientation  <br>
-``` 
-awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > overlap.coords
-``` 
-situation4. One representatives covering at least 50% of the other one <br>
-``` 
-awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > part.coords
-``` 
+situation1. The two representatives are identical `identity.coords` <br> 
+situation2. One representative is contained, the identity cutoff is over 90%  `contained.coords` <br>
+situation3. The ends of two representatives overlap in the correct arrangement and orientation `overlap.coords` <br>
+situation4. One representatives covering at least 50% of the other one `part.coords`<br>
+
 5.2. Update the alignment result<br>
 ``` 
 python reorg_align_info.py  --LEP_bed LEP_contigs.bed --REP_bed REP_contig.bed --Identity_path identity.coords --Contained_path contained.coords  --Overlap_path overlap.coords --Part_align_path part.coords --save_folder updated_alignment_folder
