@@ -49,25 +49,22 @@ samtools view -h -F 2304 readtocontig.sam  | samtools sort -n -O bam | bedtools 
 samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 in a{ print $0 ; delete a[$1]; next }' readtocontig.txt <( samtools view alignedmate_GRCh38.sam )) | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"}{print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" | sort > pass_mates.txt 
 join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt 
 ``` 
-### 3.	Obtain unambiguous placement for each contig <br> 
+Based on the alignment information, get the unambiguous placement for each contig. <br>
+
+### 3. Extract contig ends and GRCh38 regions<br> 
 ``` 
-samtools faidx contig_ID.fa 
-python placed_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
-``` 
-### 4. Extract contig ends and GRCh38 regions<br> 
-``` 
-# For files in unambiguous_placed_regions_folder/Placed folder, 
+# For files in unambiguous_placed_regions_folder/LEP or unambiguous_placed_regions_folder/REP folder, 
 awk '{print $2":"$3"-"$4}' unambiguous_placed_regions_folder/Placed/contig_ID.txt > contig_ID_LEP/REP_region.txt
 samtools faidx GRCh38_no_alt.fa contig_ID_LEP_region.txt > GRCh38_Region.fa 
 samtools faidx contig_ID.fa region > LEP/REP_contig.fa
 
 ``` 
-### 5. Align contigs to the region determined by the linking mates <br>
+### 4. Align contigs to the region determined by the linking mates <br>
 ``` 
 nucmer  --maxmatch -l 15 -b 1 -c 15 -p contig_ID GRCh38_Regions.fa REP_contig.fa/LEP_contig.fa  
 delta-filter -q -r -o 0 -g contig_ID.delta > filtered_info.delta 
 ``` 
-### 6. Determine BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
+### 5. Determine BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
 ``` 
 python contig_type.py  --ref_name_id GRCH38.fa.fai --alignment_info PATH_filtered_info.delta  --LEP_contigs LEP_folder --REP_contigs REP_folder --BEP_contigs BEP_folder --BEP_contigs_all all_BEP_folder
 ```
