@@ -193,16 +193,16 @@ gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile
 ### 2. Align unaligned reads of 486 individuals to common sequences 
 ``` 
 bwa index -p common_seq_id  common_seq.fa<br>
-bwa mem common_seq_id unaligned_reads.fa > alignment.sam <br>
-samtools view -h  -F 2304  alignment.sam  | htsbox samview -pS - > Filter_aligned.paf  <br>
+bwa mem common_seq_id unaligned_reads.fa > alignment.sam 
+samtools view -h  -F 2304  alignment.sam  | htsbox samview -pS - > Filter_aligned.paf  
 ``` 
 ### 3. Annotate placed contigs
 ``` 
-vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz<br>
+vep -i contig_insertion_points.vcf -o contig_annotation --dir Cache_path --cache --offline --fasta GRCh38_primary.fa --species homo_sapiens --everything --plugin StructuralVariantOverlap,file=gnomad_v2_sv.sites.vcf.gz
 ``` 
 ### 4. Compare with other genomes
 ``` 
-bwa index -p other_genome_Id  other_genome.fa<br>
-bwa mem other_genome_Id CPG.fa > alignment.sam<br>
+bwa index -p other_genome_Id  other_genome.fa
+bwa mem other_genome_Id CPG.fa > alignment.sam
 ``` 
 
