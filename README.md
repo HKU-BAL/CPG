@@ -185,14 +185,14 @@ cd-hit-est -i remain_unplaced.fa -o unplaced_cluster  -c 0.9 -n 8 <br>
 ### 1. Call variants  
 ``` 
 bwa index -p new_ref_Id  new_ref.fa<br>
-bwa mem new_ref_Id read1.fq read2.fq > alignment.sam<br>
-java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=alignment.markdup.txt<br>
-java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam<br>
-gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile<br>
+bwa mem new_ref_Id read1.fq read2.fq > alignment.sam
+java -jar picard.jar MarkDuplicates I=alignment.sam O=alignment.markdup.sam M=alignment.markdup.txt
+java  -jar picard.jar BuildBamIndex I=alignment.markdup.sam
+gatk HaplotypeCallerSpark -R GRCh38_decoy.fa -I alignment.markdup.sam -O vcffile
 ``` 
 ### 2. Align unaligned reads of 486 individuals to common sequences 
 ``` 
-bwa index -p common_seq_id  common_seq.fa<br>
+bwa index -p common_seq_id  common_seq.fa
 bwa mem common_seq_id unaligned_reads.fa > alignment.sam 
 samtools view -h  -F 2304  alignment.sam  | htsbox samview -pS - > Filter_aligned.paf  
 ``` 
