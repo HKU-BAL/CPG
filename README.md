@@ -1,17 +1,17 @@
 # CPG
 
 # Introduction <br> 
-The current human reference genome, GRCh38, is built from several individuals, most of whom are of Caucasian and African ancestry, which limits its usefulness for genomic analyses of distinct populations. For example, some population-specific variants cannot be detected when comparing genomes with the reference. Therefore, in recent years, the importance of capturing and representing sequencing data from diverse populations has been emphasized.  <br>
-An ideal way to address the limitation is to create a pan-genome, a representation of both the core and variably distributed genomes of a species. Due to the computation complexity of assembling many deeply sequenced human genomes de novo and combining them into a genome and just a few gaps in GRCh38, we focused on finding large insertions, which made pan-genome assemble feasible.<br>
+The current human reference genome, GRCh38, is built from several individuals, most of whom are of Caucasian and African ancestry, which limits the genomic analyses of distinct populations. For example, some population-specific variants cannot be detected when comparing genomes with the reference.  <br>
+An ideal way to address the limitation is to create a pan-genome, a representation of both the core and variably distributed genomes of a species. Pan-genomic analysis better captures unexplored or missed variants to improve the decoding of the genetic basis of human diseases. Considering the computation complexity of assembling deep sequenced human genomes _de novo_ and combining them, a feasible strategy for improved references is to focus on large insertion and construct population-specific pan-genomes.<br>
 
 
 # Workflow for construction of a Chinese Pan-genome <br>
 ![Workflow](http://www.bio8.cs.hku.hk/RNA/CPG_workflow.png)<br> 
-Firstly, we aligned the sequencing reads of 486 Han Chinese to the GRCh38.p13 reference genome individually and gained reads that could not be mapped to the reference genome. The unaligned reads were assembled into contigs (continuous sequences). Any contigs identified as contaminants or mapped to GRCh38 were eliminated. Based on the alignment positions of contigs’ reads and mates to GRCh38, we classified these contigs into two types: placed and unplaced ones. The exact insertion breakpoints of the placed contigs were determined and the placed contigs were then separated into three parts: right-end-placed (REP), left-end-placed (LEP) and both-end-placed (BEP). Secondly, we compared the placed contigs against one another and clustered together the similar contigs that placed close to each other. Unplaced contigs aligned closely to the placed ones with high identities were also included in the placed clusters. The remaining unplaced contigs were clustered by the cd-hit-est method. <br>
+Firstly, we aligned the sequencing reads of 486 Han Chinese to the GRCh38.p13 reference genome individually and gained reads that could not be mapped to the reference genome. The unaligned reads were assembled into contigs (continuous sequences). Any contigs identified as contaminants or mapped to GRCh38 were eliminated. Based on the alignment positions of contigs’ reads and mates to GRCh38, we classified these contigs into two types: placed and unplaced ones. The exact insertion breakpoints of the placed contigs were determined and the placed contigs were then separated into three parts: right-end-placed (REP), left-end-placed (LEP) and both-end-placed (BEP). Secondly, we compared the placed contigs against one another and clustered together the similar contigs that placed close to each other. Unplaced contigs aligned closely to the placed ones with high identities were also included in the placed clusters. Finally, the remaining unplaced contigs were clustered by cd-hit-est. <br>
 
 # Construction <br> 
 ## Data format <br> 
-The name format of raw reads is `Prefix+"_"+read_ID+"_"+sample_ID`, like K14_17534_T1203 <br> 
+The name format of raw reads is `Prefix+"_"+read_ID`, like K14_17534. <br> 
 
 ## Step1. Assembly and filtering of novel contigs <br>
 ### 1.	Align reads to reference <br>
@@ -49,38 +49,38 @@ samtools view -h -F 2304 readtocontig.sam  | samtools sort -n -O bam | bedtools 
 samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 in a{ print $0 ; delete a[$1]; next }' readtocontig.txt <( samtools view alignedmate_GRCh38.sam )) | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"}{print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" | sort > pass_mates.txt 
 join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt 
 ``` 
-### 3.	Examine links to contig ends only, and filter based on unambiguity criteria<br> 
+### 3.	Obtain unambiguous placement for each contig <br> 
 ``` 
 samtools faidx contig_ID.fa 
-python place_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
+python placed_region.py --mates_region  mates_region.txt  --fai contig_fai_path --placed_region unambiguous_placed_regions_folder
 ``` 
-### 4. Extracted contig ends and GRCh38 regions with samtools faidx<br> 
+### 4. Extract contig ends and GRCh38 regions with samtools faidx<br> 
 ``` 
-For files in folder (unambiguous_placed_regions_folder/LEP), 
-awk '{print $2:$3"-"$4}' unambiguous_placed_regions_folder/LEP/contig_ID.txt > contig_ID_LEP_region.txt
+# For files in unambiguous_placed_regions_folder/LEP folder, 
+awk '{print $2":"$3"-"$4}' unambiguous_placed_regions_folder/LEP/contig_ID.txt > contig_ID_LEP_region.txt
 samtools faidx GRCh38_no_alt.fa contig_ID_LEP_region.txt > GRCh38_Region.fa 
-samtools faidx contig_ID.fa $contig_ID":0-100" > Lep_contig.fa
+samtools faidx contig_ID.fa $contig_ID":0-100" > LEP_contig.fa
 
-For files in folder (unambiguous_placed_regions_folder/REP), 
+# For files in unambiguous_placed_regions_folder/REP folder, 
 awk '{print $2:$3"-"$4}' unambiguous_placed_regions_folder/REP/contig_ID.txt > contig_ID_REP_region.txt
 samtools faidx GRCh38_no_alt.fa contig_ID_REP_region.txt > GRCh38_Region.fa 
 contig_REP_start=`expr $contig_length - 100`
-samtools faidx contig_ID.fa $contig_ID":"$contig_REP_start"-"$contig_length > Rep_contig.fa
+samtools faidx contig_ID.fa $contig_ID":"$contig_REP_start"-"$contig_length > REP_contig.fa
 ``` 
 ### 5. Align contigs to the region determined by the linking mates <br>
 ``` 
-nucmer  --maxmatch -l 15 -b 1 -c 15 -p contig_ID GRCh38_Regions.fa Rep_contig.fa/Rep_contig.fa  
+nucmer  --maxmatch -l 15 -b 1 -c 15 -p contig_ID GRCh38_Regions.fa REP_contig.fa/LEP_contig.fa  
 delta-filter -q -r -o 0 -g contig_ID.delta > filtered_info.delta 
 ``` 
-### 6. Obtain BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
+### 6. Determine BEP/LEP/REP contigs and the corresponding placedment positions  <br> 
 ``` 
 python contig_type.py  --ref_name_id GRCH38.fa.fai --alignment_info PATH_filtered_info.delta  --LEP_contigs LEP_folder --REP_contigs REP_folder --BEP_contigs BEP_folder --BEP_contigs_all all_BEP_folder
-``` 
-Please move contigs in BEP_contigs_all folder from the LEP/REP file to unplaced file. And the remaining contigs are unplaced. <br>
+```
+Please remove contigs in BEP_contigs_all folder from the LEP/REP folder. The remaining contigs are unplaced. <br>
 
 ## Step3. Cluster placed contigs <br>
 ### 1.	Cluster placed contigs <br>
-1.1.  Get the placement locations of contigs (`placed_contigs.sorted.bed`)<br>
+1.1.  Get the placement locations of contigs <br>
 ``` 
 # For BEP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"b[1],"-";  else print $2,$3-1,$5,$1"_"b[1],"+"}' BEP_folder/* |bedtools sort -i > BEP_contigs.bed 
@@ -88,7 +88,7 @@ awk '{OFS="\t"} {split(FILENAME,b,"."); if($7=="reverse") print $2,$3-1,$5,$1"_"
 # For LEP/REP contigs, 
 awk '{OFS="\t"} {split(FILENAME,b,"."); if($4=="reverse") print $2,$7-1,$8,$1"_"b[1],"-";  else print $2,$7-1,$8,$1"_"b[1],"+"}' LEP/REP_folder/* |bedtools sort -i > LEP/REP_contigs.bed
 ``` 
-1.2.  Merge contigs in same type.<br>
+1.2.  Group contigs based on placement positions<br>
 ``` 
 bedtools merge -d 20 -c 4 -o distinct -i  placed_contigs.sorted.bed > merge_contigs.bed 
 ``` 
@@ -101,30 +101,31 @@ python rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_cont
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
 Only save contigs that hit to representative (save folder: `remain_cluster_folder`) <br>
-### 4. Add other types of contigs to sequences in current clusters <br>
-4.1.  Align contigs to sequences in the clusters.<br>
+
+### 4. Move other types of contigs to sequences to the current clusters <br>
+4.1.  Align contigs to sequences in the clusters <br>
 ``` 
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id 
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
 apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_contig.tsv 
 ``` 
-4.2.  Obtain contigs that can be added to the clusters.<br> 
-Two types of contigs:
+4.2.  Obtain contigs that can be added to the clusters <br> 
 ``` 
+# Two types of contigs
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
 ``` 
-Get contigs that satisy two contiditions from the list of candidate contigs <br> 
+Determine which candidate contigs can be contained <br> 
 ```
 python pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
 ``` 
 
-4.3.  Add other types of contigs into the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
+4.3.  Add other types of contigs to the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
 ```
 python move_contigs.py --ensure_contigs -Ensure_contigs.txt -pass_contigs pass_contigs.txt --cluster_folder remain_cluster_folder --contig_path othertype_contig_path
 ```
 ### 5. Merge left-end placed and right-end placed contigs into a longer insertion<br>
-5.1. If an LEP contig and an REP contig were within 100 bp in the same orientation, please align the two contigs with each other. <br> 
+5.1. For two contigs within 100 bp in the same orientation, align the two contigs <br> 
 ``` 
 nucmer -f  -p align_info left_placed.fa  right_placed.fa 
 delta-filter -q  -r -g -m -1 align_info > filterdalign_info.delta 
@@ -132,10 +133,21 @@ show-coords -H -T -l -c -o filterdalign_info.delta > filterdalign_info.coords
 ``` 
 Classify the alignment result into four situtaions:<br>
 situation1. The two representatives are identical. `identity.coords`<br>
+``` 
+awk '{OFS="\t"}{if ($NF=="[IDENTITY]") print $0}' filterdalign_info.coords | sort |uniq > identity.coords
+``` 
 situation2. One representative is contained, the identity cutoff is over 90%.  `contained.coords`<br>
+``` 
+awk '{OFS="\t"}{if ($7>=identity_cutoff && ($NF=="[CONTAINED]" || $NF=="[CONTAINS]")) print $0}' filterdalign_info.coords |sort |uniq  > contained.txt
+``` 
 situation3. The ends of two representatives overlap in the correct arrangement and orientation. `overlap.coords`<br>
+``` 
+awk '{OFS="\t"}{if ($7>=identity_cutoff && $11>= minimun_cov_cutoff && $NF=="[END]") print $0}' filterdalign_info.coords |sort|uniq  > overlap.txt
+``` 
 situation4. One representatives covering at least 50% of the other one. `part.coords`<br>
-
+``` 
+awk '{OFS="\t"}{if (($10>=coverage_cutoff || $11>=coverage_cutoff) && $NF!="[IDENTITY]" && $NF!="[CONTAINS]" && $NF!="[CONTAINED]") print $0}' filterdalign_info.coords|sort|uniq  > part.txt
+``` 
 5.2. Update the alignment result<br>
 ``` 
 #Due to one contigs could have several alignment result, we set the alignment priority: identity > contained > overlap > part, and update the alignment results.
