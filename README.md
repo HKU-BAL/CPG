@@ -28,7 +28,7 @@ samtools view -f 8 -F 4 alignment.sam > alignedmate_GRCh38.sam
 ``` 
 ### 3. Assemble unaligned reads into contigs <br>
 ``` 
-Megahit -r R1_Unalignedmate.fq , R2_Unalignedmate.fq, R1_alignedmate.fq, R2_alignedmate.fq  -o sample_1 
+megahit -r R1_Unalignedmate.fq , R2_Unalignedmate.fq, R1_alignedmate.fq, R2_alignedmate.fq  -o sample_1 
 ```  
 ### 4. 	Remove contaminations and contigs aligned to reference <br>
 ``` 
