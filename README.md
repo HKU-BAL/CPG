@@ -94,8 +94,8 @@ nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
 Only save contigs that hit to representative (save folder: `remain_cluster_folder`) <br>
 
-### 4. Move other types of contigs to sequences to the current clusters <br>
-4.1.  Align contigs to sequences in the clusters <br>
+### 4. Move other types of contigs to the current clusters <br>
+4.1.  Align contigs to sequences that belong to the current clusters <br>
 ``` 
 makeblastdb -in remaining_cluster.fa -dbtype nucl -out remainingcontigs_Id 
 blastn -db remainingcontigs_Id -query othertype_contig.fa -outfmt "6  qseqid sseqid pident qlen slen length qstart qend sstart send mismatch g
