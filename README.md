@@ -57,7 +57,6 @@ Based on the alignment information, get the unambiguous placement for each conti
 awk '{print $2":"$3"-"$4}' unambiguous_placed_regions_folder/Placed/contig_ID.txt > contig_ID_LEP/REP_region.txt
 samtools faidx GRCh38_no_alt.fa contig_ID_LEP_region.txt > GRCh38_Region.fa 
 samtools faidx contig_ID.fa region > LEP/REP_contig.fa
-
 ``` 
 ### 4. Align contigs to the region determined by the linking mates <br>
 ``` 
@@ -144,13 +143,13 @@ show-coords -H -T -l -c -o REP_rep_LEP_cluster_filter.delta > REP_rep_LEP_cluste
 Only REP_rep_LEP_cluster_filter/LEP_rep_REP_cluster_filter.coords reports `CONTAINED/IDENTITY` can the alignment result be saved 
 Results are saved in `updated_alignment_folder/final_part.txt`, file format: `LEP_rep REP_rep New_rep.{r/l}`. <br>
 
-5.3. Merge overlaping a LEP and REP representative into one longer contig <br>
+5.3. Merge LEP and REP representatives into longer single contigs <br>
 ``` 
 popins merge -c LEP_REP.fa <br>
 ``` 
 Save files in `merged/` 
 
-5.4.  Update the the placed representatives and corresponding clusters <br>
+5.4.  Update the placed representatives and corresponding clusters <br>
 ``` 
 python update_ref.py --LEP_folder LEP_folder/ --REP_folder  REP_folder/  --contigs_fai  contigs_fai_path  --LEP_cluster_folder LEP_cluster_folder --REP_cluster_folder  --LEP_rep_folder LEP_rep/ --REP_rep_folder REP_rep/ --align_folder updated_alignment_folder/  --LEP_cluster_update_folder LEP_cluster_update/ --LEP_rep_update_folder LEP_rep_update --REP_cluster_update_folder REP_cluster_update/ --REP_rep_update_folder REP_rep_update/ --BEP_rep_folder BEP_rep/ --BEP_cluster_folder BEP_cluster/ --merged_contig_folder merged/
 ``` 
