@@ -3,12 +3,11 @@ import collections
 from Bio import SeqIO
 import argparse
 
-
-def insertion_points(LEP_folder, REP_folder, contigs_fai):
+def insertion_points( LEP_folder, REP_folder, contigs_fai):
     f = open(contigs_fai, 'r')
     contig_len = {}
     for line in f.readlines():
-        line = line.split('\n')[0]
+        line= line.split('\n')[0]
         line = line.split('\t')
         contig_len[line[0]] = int(line[1])
     f.close()
@@ -22,14 +21,13 @@ def insertion_points(LEP_folder, REP_folder, contigs_fai):
             line = line.split('\n')[0]
             line = line.split('\t')
             contig_ID = line[0] + '_' + sample_ID
-
+           
             length = contig_len[contig_ID]
             if line[3] == "reverse":
                 map_len = 101 - int(line[8])
             else:
                 map_len = int(line[9]) - 1
-            contig_insertion[contig_ID] = [int(line[7]) - 1, 1.0 * (int(line[9]) - int(line[8])) / length, length,
-                                           map_len]
+            contig_insertion[contig_ID] = [int(line[7]) - 1,1.0 * (int(line[9]) - int(line[8]))/length, length, map_len]
         f.close()
 
     files = os.listdir(REP_folder)
@@ -45,12 +43,10 @@ def insertion_points(LEP_folder, REP_folder, contigs_fai):
                 map_len = 101 - int(line[8])
             else:
                 map_len = int(line[9]) - 1
-            contig_insertion[contig_ID] = [int(line[6]) - 1, 1.0 * (int(line[9]) - int(line[8])) / length, length,
-                                           map_len]
+            contig_insertion[contig_ID] = [int(line[6]) - 1,1.0 * (int(line[9]) - int(line[8]))/length, length, map_len]
         f.close()
 
     return contig_insertion
-
 
 def obtain_seq(LEP_cluster_folder, REP_cluster_folder, LEP_rep_folder, REP_rep_folder):
     LEP_rep = collections.defaultdict(list)
@@ -86,6 +82,7 @@ def obtain_seq(LEP_cluster_folder, REP_cluster_folder, LEP_rep_folder, REP_rep_f
     return LEP_cluster, REP_cluster, LEP_rep, REP_rep
 
 
+
 def move_SEP_contigs(file, LEP_cluster, REP_cluster, LEP_add, REP_add, delete_LEP, delete_REP):
     f = open(file, 'r')
 
@@ -113,7 +110,6 @@ def move_SEP_contigs(file, LEP_cluster, REP_cluster, LEP_add, REP_add, delete_LE
     f.close()
     return LEP_add, REP_add, delete_LEP, delete_REP
 
-
 def overlap_SEP(file, contig_insert_pos):
     f = open(file, 'r')
     move_LEP = set()
@@ -121,8 +117,8 @@ def overlap_SEP(file, contig_insert_pos):
     for line in f.readlines():
         line = line.split('\n')[0]
         line = line.split('\t')
-        seq1 = line[len(line) - 2]  # LEP
-        seq2 = line[len(line) - 1]  # REP
+        seq1 = line[len(line) - 2] # LEP
+        seq2 = line[len(line) - 1] # REP
         contig_ID = seq1 + "." + seq2
         if int(contig_insert_pos[seq1][0]) > int(contig_insert_pos[seq2][0]):
             if contig_insert_pos[seq1][1] < contig_insert_pos[seq2][1]:
@@ -143,8 +139,7 @@ def overlap_SEP(file, contig_insert_pos):
     return move_LEP, move_REP
 
 
-def check_BEP_contigs(file, move_LEP, move_REP, LEP_cluster, REP_cluster, delete_LEP, delete_REP, LEP_add, REP_add,
-                      LEP_rep, REP_rep, merged_contig_folder):
+def check_BEP_contigs(file, move_LEP, move_REP, LEP_cluster, REP_cluster, delete_LEP, delete_REP, LEP_add,REP_add, LEP_rep, REP_rep,merged_contig_folder):
     f = open(file, 'r')
     BEP_add = collections.defaultdict(list)
     for line in f.readlines():
@@ -176,7 +171,7 @@ def check_BEP_contigs(file, move_LEP, move_REP, LEP_cluster, REP_cluster, delete
         delete_LEP.add(line[0])
         delete_REP.add(line[1])
     f.close()
-    return BEP_add, LEP_rep, REP_rep, LEP_add, REP_add, delete_LEP, delete_REP
+    return BEP_add, LEP_rep, REP_rep,LEP_add, REP_add, delete_LEP, delete_REP
 
 
 def reobtain_rep_cluster(LEP_cluster, REP_cluster, LEP_rep, REP_rep, BEP_add, LEP_add, REP_add, delete_LEP, delete_REP,
@@ -248,12 +243,8 @@ def reobtain_rep_cluster(LEP_cluster, REP_cluster, LEP_rep, REP_rep, BEP_add, LE
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Update the placed representatives and corresponding clusters.")
-    parser.add_argument("--LEP_folder",
-                        help="the folder of LEP contigs' alignment information (step2.files from point6)",
-                        required=True, default=None)
-    parser.add_argument("--REP_folder",
-                        help="fthe folder of REP contigs' alignment information (step2.files from point6)",
-                        required=True, default=None)
+    parser.add_argument("--LEP_folder", help="the folder of LEP contigs' alignment information (step2.files from point6)", required=True, default=None)
+    parser.add_argument("--REP_folder", help="fthe folder of REP contigs' alignment information (step2.files from point6)", required=True, default=None)
     parser.add_argument("--contigs_fai", help="folder of contig.fa.fai", required=True, default=None)
     parser.add_argument("--LEP_cluster_folder", help="folder of LEP_contigs.fa", required=True, default=None)
     parser.add_argument("--REP_cluster_folder", help="folder of REP_cluster.fa", required=True, default=None)
@@ -273,7 +264,7 @@ if __name__ == '__main__':
     parser.add_argument("--BEP_rep_folder", help="folder of REP_rep.fa", required=True, default=None)
     parser.add_argument("--BEP_cluster_folder", help="folder of BEP_contigs.fa", required=True, default=None)
     FLAGS = parser.parse_args()
-    #
+#
     LEP_cluster, REP_cluster, LEP_rep, REP_rep = obtain_seq(LEP_cluster_folder=FLAGS.LEP_cluster_folder,
                                                             REP_cluster_folder=FLAGS.REP_cluster_folder,
                                                             LEP_rep_folder=FLAGS.LEP_rep_folder,
@@ -288,15 +279,9 @@ if __name__ == '__main__':
         LEP_add, REP_add, delete_LEP, delete_REP = move_SEP_contigs(file_path, LEP_cluster, REP_cluster, LEP_add,
                                                                     REP_add, delete_LEP, delete_REP)
     file = FLAGS.align_folder + "final_overlap.txt"
-    contig_insertion = insertion_points(LEP_folder=FLAGS.LEP_folder, REP_folder=FLAGS.REP_folder,
-                                        contigs_fai=FLAGS.contigs_fai)
+    contig_insertion = insertion_points( LEP_folder=FLAGS.LEP_folder, REP_folder = FLAGS.REP_folder, contigs_fai =FLAGS.contigs_fai)
     move_LEP, move_REP = overlap_SEP(file, contig_insertion)
-    BEP_add, LEP_rep, REP_rep, LEP_add, REP_add, delete_LEP, delete_REP = check_BEP_contigs(file, move_LEP, move_REP,
-                                                                                            LEP_cluster, REP_cluster,
-                                                                                            delete_LEP, delete_REP,
-                                                                                            LEP_add, REP_add, LEP_rep,
-                                                                                            REP_rep,
-                                                                                            merged_contig_folder=FLAGS.merged_contig_folder)
+    BEP_add, LEP_rep, REP_rep,LEP_add, REP_add, delete_LEP, delete_REP = check_BEP_contigs(file, move_LEP, move_REP,  LEP_cluster, REP_cluster, delete_LEP, delete_REP,LEP_add,REP_add, LEP_rep, REP_rep, merged_contig_folder=FLAGS.merged_contig_folder)
     reobtain_rep_cluster(LEP_cluster, REP_cluster, LEP_rep, REP_rep, BEP_add, LEP_add, REP_add, delete_LEP, delete_REP,
                          REP_rep_update_folder=FLAGS.REP_rep_update_folder,
                          REP_cluster_update_folder=FLAGS.REP_cluster_update_folder,
