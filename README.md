@@ -105,12 +105,9 @@ apopen gaps evalue bitscore" -max_target_seqs 1  -max_hsps 1  -out  othertype_co
 ``` 
 # Two types of contigs
 awk '{OFS="\t"}{if($3>99 && ($6-$13)/$4>=0.99 && ($6-$13) /$5>=0.8 ) print $2,$1}' othertype_contig.tsv > Ensure_contigs.txt
-awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' thertype_contig.tsv > candidate_contigs.txt
+awk '{OFS="\t"}{if($3>99 && ($6-$13)/$5<0.8 && ($6-$13)/$4>=0.99 ) print $2,$1}' othertype_contig.tsv > candidate_contigs.txt
 ``` 
-Determine which candidate contigs can be contained <br> 
-```
-python pass_contigs.py  --mates_region mates_region_path  --candiate_contigs candidate_contigs.txt --pass_contigs pass_contigs.txt
-``` 
+Remove some candidate contigs based on the placement of their linking mates. The remaining contigs are saved in `pass_contigs.txt`, file format: `Rep_ID  pass_contig_ID` <br> 
 
 4.3.  Add other types of contigs to the current cluster (contigs from Ensure_contigs.txt and pass_contigs,txt)<br>
 ```
