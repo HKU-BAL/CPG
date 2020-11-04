@@ -43,7 +43,7 @@ blastn -db ref_alt_Id -query contig.fa -outfmt 6 -max_target_seqs 1  -max_hsps 1
 bowtie2-build filteredcontig.fa contig_Id 
 bowtie2 -x contig_Id -U R1_alignedmate.fq, R2_alignedmate.fq  -S readtocontig.sam 
 ``` 
-### 2. Determine the placement region by reads and mates<br>
+### 2. Determine the placement regions by reads and mates<br>
 ``` 
 samtools view -h -F 2304 readtocontig.sam  | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"} {print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" |sort > readtocontig.txt 
 samtools view -H alignedmate_GRCh38.sam | cat - <(awk 'NR==FNR{ a[$1]; next }$1 in a{ print $0 ; delete a[$1]; next }' readtocontig.txt <( samtools view alignedmate_GRCh38.sam )) | samtools sort -n -O bam | bedtools bamtobed -i stdin | awk '{OFS="\t"}{print $4,$1,$6,$2,$3}' | sed -e "s/\/[1-2]//g" | sort > pass_mates.txt 
@@ -51,12 +51,10 @@ join -j 1 readtocontig.txt pass_mates.txt > mates_region.txt
 ``` 
 Based on the alignment information, get the unambiguous placement for each contig. <br>
 
-### 3. Extract contig ends and GRCh38 regions<br> 
+### 3. Extract contig ends and GRCh38 regions <br> 
 ``` 
-# For files in unambiguous_placed_regions_folder/LEP or unambiguous_placed_regions_folder/REP folder, 
-awk '{print $2":"$3"-"$4}' unambiguous_placed_regions_folder/Placed/contig_ID.txt > contig_ID_LEP/REP_region.txt
-samtools faidx GRCh38_no_alt.fa contig_ID_LEP_region.txt > GRCh38_Region.fa 
-samtools faidx contig_ID.fa region > LEP/REP_contig.fa
+samtools faidx GRCh38_no_alt.fa unambiguou_placement > GRCh38_Region.fa 
+samtools faidx contig_ID.fa LEP/REP_region > LEP/REP_contig.fa
 ``` 
 ### 4. Align contigs to the region determined by the linking mates <br>
 ``` 
@@ -91,7 +89,7 @@ python rep_obtain.py --seq_path LEP/REP/BEP_seq_path --path_merge_bed merge_cont
 ``` 
 nucmer -p align_info  rep.fa cluster.fa<br>
 ``` 
-Only save contigs that hit to representative (save folder: `remain_cluster_folder`) <br>
+Save contigs that hit to representative (save folder: `remain_cluster_folder`) <br>
 
 ### 4. Move other types of contigs to the current clusters <br>
 4.1.  Align contigs to sequences that belong to the current clusters <br>
