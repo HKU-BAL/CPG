@@ -2,7 +2,7 @@
 
 # Introduction <br> 
 The current human reference genome, GRCh38, is built from several individuals, most of whom are of Caucasian and African ancestry, which limits the genomic analyses of distinct populations. For example, some population-specific variants cannot be detected when comparing genomes with the reference.  <br>
-An ideal way to address the limitation is to create a pan-genome, a representation of both the core and variably distributed genomes of a species. By better capturing unexplored or missed variants, Ppan-genomic analysis improves the decoding of the genetic basis of human diseases. Considering the computation complexity of assembling deep sequenced human genomes _de novo_ and combining them, a feasible strategy for constructing a pan-genome is to focus on large insertion for a specific population.<br>
+An ideal way to address the limitation is to create a pan-genome, a representation of both the core and variably distributed genomes of a species. By better capturing unexplored or missed variants, pan-genomic analysis improves the decoding of the genetic basis of human diseases. Considering the computation complexity of assembling deep sequenced human genomes _de novo_ and combining them, a feasible strategy for constructing a pan-genome is to focus on large insertion for a specific population.<br>
 
 
 # Workflow for construction of a Chinese Pan-genome <br>
