@@ -6,7 +6,7 @@ An ideal way to address the limitation is to create a pan-genome, a representati
 
 
 # Workflow for construction of a Chinese Pan-genome <br>
-![Workflow](http://www.bio8.cs.hku.hk/RNA/CPG_workflow.png)<br> 
+![Workflow](http://www.bio8.cs.hku.hk/novel/CPG_workflow.png)<br> 
 Firstly, we aligned the sequencing reads of 486 Han Chinese to the GRCh38.p13 reference genome individually and gained reads that could not be mapped to the reference genome. The unaligned reads were assembled into contigs (continuous sequences). Any contigs identified as contaminants or mapped to GRCh38 were eliminated. Based on the alignment positions of contigs’ reads and mates to GRCh38, we classified these contigs into two types: placed and unplaced ones. The exact insertion breakpoints of the placed contigs were determined and the placed contigs were then separated into three parts: right-end-placed (REP), left-end-placed (LEP) and both-end-placed (BEP). Secondly, we compared the placed contigs against one another and clustered together the similar contigs that placed close to each other. Unplaced contigs aligned closely to the placed ones with high identities were also included in the placed clusters. Finally, the remaining unplaced contigs were clustered by cd-hit-est. <br>
 
 # Construction <br> 
